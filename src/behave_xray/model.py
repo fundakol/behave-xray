@@ -55,6 +55,9 @@ class TestExecution:
             test = TestCase(**test)
         self.tests.append(test)
 
+    def flush(self):
+        self.tests = []
+
     def as_dict(self) -> Dict[str, Any]:
         tests = [test.as_dict() for test in self.tests]
         info = dict(startDate=self.start_date.strftime(DATETIME_FORMAT),

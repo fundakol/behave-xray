@@ -88,8 +88,9 @@ class XrayFormatter(Formatter):
     def eof(self):
         if self.config.dry_run:
             return
-
-        for scenario, xray in _scenario_keys.items():
+        while _scenario_keys:
+            _, xray = _scenario_keys.popitem()
             if xray.test_key:
                 self.test_execution.append(xray)
         self.xray_publisher.publish(self.test_execution)
+        self.test_execution.flush()
