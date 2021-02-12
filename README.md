@@ -2,6 +2,13 @@
 
 ### Installation
 
+
+```commandline
+pip install -U behave-xray
+```
+
+or 
+
 ```commandline
 python setup.py install
 ```

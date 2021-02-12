@@ -21,11 +21,12 @@ setup(
     version=__version__,
     packages=find_packages('src'),
     package_dir={"": "src"},
-    url='',
+    url='https://github.com/fundakol/behave-xray',
     author='Lukasz Fundakowski',
     author_email='fundakol@yahoo.com',
     description='Behave JIRA XRAY results uploader',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     python_requires='>=3.6',
     install_requires=[
         'behave',
