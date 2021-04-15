@@ -7,8 +7,6 @@ from behave.model import Status as ScenarioStatus
 from behave_xray.model import XrayStatus, TestCase, TestExecution
 from behave_xray.xray_publisher import XrayPublisher
 
-_scenario_keys = defaultdict(lambda: TestCase())
-
 
 def get_test_execution_tag(tag):
     match = re.match(r"jira\.test_execution\('(.+)'\)", tag)
@@ -42,6 +40,7 @@ class XrayFormatter(Formatter):
 
     def __init__(self, stream, config):
         super().__init__(stream, config)
+        self._scenario_keys = defaultdict(lambda: TestCase())
         self.current_feature = None
         self.current_scenario = None
         self.test_execution = TestExecution()
@@ -66,31 +65,32 @@ class XrayFormatter(Formatter):
             for tag in scenario.tags:
                 tk = get_test_case_tag(tag)
                 if tk:
-                    _scenario_keys[scenario].test_key = tk
+                    self._scenario_keys[scenario].test_key = tk
 
     def result(self, result):
         if self.current_scenario.status == ScenarioStatus.untested:
             return
 
-        _scenario_keys[self.current_scenario].duration = result.duration
+        self._scenario_keys[self.current_scenario].duration = result.duration
 
         if self.current_scenario.status == ScenarioStatus.passed:
-            _scenario_keys[self.current_scenario].status = XrayStatus.PASS
+            self._scenario_keys[self.current_scenario].status = XrayStatus.PASS
         if result.status == ScenarioStatus.failed:
-            _scenario_keys[self.current_scenario].status = XrayStatus.FAIL
-            _scenario_keys[self.current_scenario].comment = result.error_message
+            self._scenario_keys[self.current_scenario].status = XrayStatus.FAIL
+            self._scenario_keys[self.current_scenario].comment = result.error_message
         if result.status == ScenarioStatus.untested:
-            _scenario_keys[self.current_scenario].status = XrayStatus.TODO
+            self._scenario_keys[self.current_scenario].status = XrayStatus.TODO
         if result.status == ScenarioStatus.skipped:
-            _scenario_keys[self.current_scenario].status = XrayStatus.ABORTED
-            _scenario_keys[self.current_scenario].comment = self.current_scenario.skip_reason
+            self._scenario_keys[self.current_scenario].status = XrayStatus.ABORTED
+            self._scenario_keys[self.current_scenario].comment = self.current_scenario.skip_reason
 
     def eof(self):
         if self.config.dry_run:
             return
-        while _scenario_keys:
-            _, xray = _scenario_keys.popitem()
+        while self._scenario_keys:
+            _, xray = self._scenario_keys.popitem()
             if xray.test_key:
                 self.test_execution.append(xray)
-        self.xray_publisher.publish(self.test_execution)
+        if self.test_execution.tests:
+            self.xray_publisher.publish(self.test_execution)
         self.test_execution.flush()
