@@ -92,5 +92,6 @@ class XrayFormatter(Formatter):
             _, xray = _scenario_keys.popitem()
             if xray.test_key:
                 self.test_execution.append(xray)
-        self.xray_publisher.publish(self.test_execution)
+        if self.test_execution.tests:
+            self.xray_publisher.publish(self.test_execution)
         self.test_execution.flush()
