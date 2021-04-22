@@ -9,7 +9,7 @@ from behave_xray.xray_publisher import XrayPublisher
 
 
 def get_test_execution_tag(tag):
-    match = re.match(r"jira\.test_execution\('(.+)'\)", tag)
+    match = re.match(r"^jira\.test_?execution\('(.+)'\)$", tag, flags=re.IGNORECASE)
     if match:
         return match.group(1)
     else:
@@ -17,7 +17,7 @@ def get_test_execution_tag(tag):
 
 
 def get_test_plan_tag(tag):
-    match = re.match(r"jira\.test_plan\('(.+)'\)", tag)
+    match = re.match(r"^jira\.test_?plan\('(.+)'\)$", tag, flags=re.IGNORECASE)
     if match:
         return match.group(1)
     else:
@@ -25,12 +25,13 @@ def get_test_plan_tag(tag):
 
 
 def get_test_case_tag(tag):
-    match = re.match(r"allure\.testcase\('(.+)'\)", tag)
+    match = re.match(r"^(allure|jira)\.test_?case\(['\"](.+)['\"]\)$", tag, flags=re.IGNORECASE)
     if match:
-        return match.group(1)
-    match = re.match(r"jira\.testcase\('(.+)'\)", tag)
+        return match.group(2)
+    # for outline scenario
+    match = re.match(r"^(allure|jira)\.test_?case(.+)$", tag, flags=re.IGNORECASE)
     if match:
-        return match.group(1)
+        return match.group(2)
     else:
         return None
 
@@ -47,6 +48,9 @@ class XrayFormatter(Formatter):
         jira_url = environ["XRAY_API_BASE_URL"]
         auth = (environ["XRAY_API_USER"], environ["XRAY_API_PASSWORD"])
         self.xray_publisher = XrayPublisher(base_url=jira_url, auth=auth)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}()'
 
     def feature(self, feature):
         self.current_feature = feature
