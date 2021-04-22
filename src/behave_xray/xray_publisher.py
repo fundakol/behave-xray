@@ -32,9 +32,8 @@ class XrayPublisher:
     def publish_xray_results(self, url: str, auth: AuthBase, data: dict) -> dict:
         headers = {'Accept': 'application/json',
                    'Content-Type': 'application/json'}
-        data = json.dumps(data)
         try:
-            response = requests.request(method='POST', url=url, headers=headers, data=data, auth=auth)
+            response = requests.request(method='POST', url=url, headers=headers, json=data, auth=auth)
         except requests.exceptions.ConnectionError as e:
             _logger.exception('ConnectionError to JIRA service %s', self.base_url)
             raise XrayError(e)
