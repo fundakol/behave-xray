@@ -21,16 +21,20 @@ class TestCase:
                  test_key: str = None,
                  status: str = XrayStatus.TODO,
                  comment: str = None,
-                 duration: float = 0.0):
+                 examples: list = None,
+                 duration: float = 0.0,
+                 is_outline: bool = False):
         self.test_key = test_key
         self.status = XrayStatus(status)
         self.comment = comment or ''
+        self.examples = examples or []
         self.duration = duration
 
     def as_dict(self) -> Dict[str, str]:
         return dict(testKey=self.test_key,
-                    status=self.status,
-                    comment=self.comment)
+                    status=self.status.name,
+                    comment=self.comment,
+                    examples=[example.name for example in self.examples])
 
     def __repr__(self):
         return f"{self.__class__.__name__}(test_key='{self.test_key}', status='{self.status}')"

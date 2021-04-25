@@ -43,6 +43,7 @@ class XrayPublisher:
             except Exception as e:
                 _logger.error('Could not post to JIRA service %s. Response status code: %s',
                               self.base_url, response.status_code)
+                _logger.error('Response error: %s', response.json())
                 raise XrayError from e
             return response.json()
 
@@ -54,5 +55,5 @@ class XrayPublisher:
             return False
         else:
             key = result['testExecIssue']['key']
-            _logger.info('Uploaded results to JIRA XRAY Test Execution: %s', key)
+            print('Uploaded results to JIRA XRAY Test Execution:', key)
             return True
