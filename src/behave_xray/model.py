@@ -34,7 +34,7 @@ class TestCase:
         return dict(testKey=self.test_key,
                     status=self.status.name,
                     comment=self.comment,
-                    examples=[example.name for example in self.examples])
+                    examples=[str(example) for example in self.examples])
 
     def __repr__(self):
         return f"{self.__class__.__name__}(test_key='{self.test_key}', status='{self.status}')"
