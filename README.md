@@ -1,5 +1,8 @@
 # behave-xray
 
+[![PyPi](https://img.shields.io/pypi/v/behave-xray.png)](https://pypi.python.org/pypi/behave-xray)
+[![Build Status](https://travis-ci.com/fundakol/behave-xray.svg?branch=master)](https://travis-ci.com/github/fundakol/behave-xray)
+
 ### Installation
 
 
@@ -39,21 +42,4 @@ Run tests:
 
 ```commandline
 behave . -f behave_xray.formatter:XrayFormatter
-```
-
-Example for Outline scenario:
-```gherkin
-# --FILE: tutorial.feature
-Feature: showing off behave
-
-    @jira.testcase(<jira>)
-    Scenario Outline: Blenders
-      Given I put <thing> in a blender,
-      When I switch the blender on
-      Then it should transform into <other thing>
-    
-      Examples:
-        | thing        | other thing | jira   |
-        | iPhone       | toxic waste | JIRA-1 |
-        | Galaxy Nexus | toxic waste | JIRA-2 |
 ```
