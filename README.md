@@ -1,5 +1,7 @@
 # behave-xray
 
+[![PyPi](https://img.shields.io/pypi/v/behave-xray.png)](https://pypi.python.org/pypi/behave-xray)
+
 ### Installation
 
 
