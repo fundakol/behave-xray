@@ -17,13 +17,14 @@ class XrayStatus(str, enum.Enum):
 
 class TestCase:
 
-    def __init__(self,
-                 test_key: str = None,
-                 status: str = XrayStatus.TODO,
-                 comment: str = None,
-                 examples: list = None,
-                 duration: float = 0.0,
-                 is_outline: bool = False):
+    def __init__(
+            self,
+            test_key: str = None,
+            status: str = XrayStatus.TODO,
+            comment: str = None,
+            examples: list = None,
+            duration: float = 0.0,
+    ):
         self.test_key = test_key
         self.status = XrayStatus(status)
         self.comment = comment or ''
@@ -31,22 +32,27 @@ class TestCase:
         self.duration = duration
 
     def as_dict(self) -> Dict[str, str]:
-        return dict(testKey=self.test_key,
-                    status=self.status.name,
-                    comment=self.comment,
-                    examples=[str(example) for example in self.examples])
+        return dict(
+            testKey=self.test_key,
+            status=self.status.name,
+            comment=self.comment,
+            examples=[str(example) for example in self.examples]
+        )
 
     def __repr__(self):
         return f"{self.__class__.__name__}(test_key='{self.test_key}', status='{self.status}')"
 
+
 class TestExecution:
 
-    def __init__(self,
-                 test_execution_key: str = None,
-                 test_plan_key: str = None,
-                 user: str = None,
-                 revision: str = None,
-                 tests: List = None):
+    def __init__(
+            self,
+            test_execution_key: str = None,
+            test_plan_key: str = None,
+            user: str = None,
+            revision: str = None,
+            tests: List = None
+    ):
         self.test_execution_key = test_execution_key
         self.test_plan_key = test_plan_key or ''
         self.user = user or ''
@@ -64,10 +70,11 @@ class TestExecution:
 
     def as_dict(self) -> Dict[str, Any]:
         tests = [test.as_dict() for test in self.tests]
-        info = dict(startDate=self.start_date.strftime(DATETIME_FORMAT),
-                    finishDate=dt.datetime.now(tz=dt.timezone.utc).strftime(DATETIME_FORMAT))
-        data = dict(info=info,
-                    tests=tests)
+        info = dict(
+            startDate=self.start_date.strftime(DATETIME_FORMAT),
+            finishDate=dt.datetime.now(tz=dt.timezone.utc).strftime(DATETIME_FORMAT)
+        )
+        data = dict(info=info, tests=tests)
         if self.test_plan_key:
             info['testPlanKey'] = self.test_plan_key
         if self.test_execution_key:
