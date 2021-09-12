@@ -2,19 +2,20 @@ import datetime as dt
 from unittest.mock import patch
 
 import pytest
-from behave_xray.formatter import TestCase, TestExecution
+from behave_xray.formatter import TestExecution as _TestExecution
+from behave_xray.formatter import TestCase as _TestCase
 
 
 @pytest.fixture
 def testcase():
-    testcase = TestCase(test_key='JIRA-1', comment='Test', status='PASS')
+    testcase = _TestCase(test_key='JIRA-1', comment='Test', status='PASS')
     return testcase
 
 
 @pytest.fixture
 def outline_testcase():
-    testcase = TestCase(test_key='JIRA-1', comment='Test', status='FAIL',
-                        examples=['PASS', 'FAIL'])
+    testcase = _TestCase(test_key='JIRA-1', comment='Test', status='FAIL',
+                         examples=['PASS', 'FAIL'])
     return testcase
 
 
@@ -32,7 +33,7 @@ def test_test_execution_output_dictionary(testcase):
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
-        te = TestExecution()
+        te = _TestExecution()
         te.tests = [testcase]
         assert te.as_dict() == {'info': {'finishDate': '2021-04-23T16:30:02+0000',
                                          'startDate': '2021-04-23T16:30:02+0000'},
@@ -46,7 +47,7 @@ def test_test_execution_output_dictionary_with_test_plan_id(testcase):
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
-        te = TestExecution(test_plan_key='Jira-10')
+        te = _TestExecution(test_plan_key='Jira-10')
         te.tests = [testcase]
         assert te.as_dict() == {'info': {'finishDate': '2021-04-23T16:30:02+0000',
                                          'startDate': '2021-04-23T16:30:02+0000',
@@ -61,7 +62,7 @@ def test_test_execution_output_dictionary_with_test_execution_id(testcase):
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
-        te = TestExecution(test_plan_key='Jira-10', test_execution_key='JIRA-20')
+        te = _TestExecution(test_plan_key='Jira-10', test_execution_key='JIRA-20')
         te.tests = [testcase]
         assert te.as_dict() == {'testExecutionKey': 'JIRA-20',
                                 'info': {'finishDate': '2021-04-23T16:30:02+0000',

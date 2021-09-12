@@ -36,7 +36,7 @@ class TestCase:
             testKey=self.test_key,
             status=self.status.name,
             comment=self.comment,
-            examples=[str(example) for example in self.examples]
+            examples=[example.name for example in self.examples]
         )
 
     def __repr__(self):
@@ -51,8 +51,15 @@ class TestExecution:
             test_plan_key: str = None,
             user: str = None,
             revision: str = None,
-            tests: List = None
+            tests: List[TestCase] = None
     ):
+        """
+        :param test_execution_key: Test execution Xray ID
+        :param test_plan_key: Test plan Xray ID
+        :param user: Xray user
+        :param revision: Revision
+        :param tests: list of Test Cases
+        """
         self.test_execution_key = test_execution_key
         self.test_plan_key = test_plan_key or ''
         self.user = user or ''
@@ -60,15 +67,21 @@ class TestExecution:
         self.start_date = dt.datetime.now(tz=dt.timezone.utc)
         self.tests = tests or []
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}()'
+
     def append(self, test: Union[dict, TestCase]) -> None:
+        """Add test case."""
         if not isinstance(test, TestCase):
             test = TestCase(**test)
         self.tests.append(test)
 
-    def flush(self):
+    def flush(self) -> None:
+        """Remove all test cases."""
         self.tests = []
 
     def as_dict(self) -> Dict[str, Any]:
+        """Serialize test execution."""
         tests = [test.as_dict() for test in self.tests]
         info = dict(
             startDate=self.start_date.strftime(DATETIME_FORMAT),

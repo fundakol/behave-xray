@@ -1,6 +1,7 @@
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
 from os import environ
+from typing import List
 
 from behave.formatter.base import Formatter
 from behave.model import Status as ScenarioStatus
@@ -20,7 +21,7 @@ class TCStatus:
     """Class store statuses for Scenario Outline."""
 
     testcase_key: str = None
-    statuses: list = field(default_factory=list)
+    statuses: List[XrayStatus] = field(default_factory=list)
     comment: str = ''
     is_outline: bool = False
 
@@ -79,34 +80,41 @@ class XrayFormatter(Formatter):
                 self.current_test_key = testcase_key
                 self.testcases[testcase_key].is_outline = self.is_scenario_outline()
 
-    def get_verdict(self, result):
+    def get_verdict(self, step):
         Verdict = namedtuple('Verdict', 'status message')
         if self.current_scenario.status == ScenarioStatus.passed:
             return Verdict(XrayStatus.PASS, '')
-        if result.status == ScenarioStatus.failed:
-            return Verdict(XrayStatus.FAIL, result.error_message)
-        if result.status == ScenarioStatus.untested:
+        if step.status == ScenarioStatus.failed:
+            return Verdict(XrayStatus.FAIL, step.error_message)
+        if step.status == ScenarioStatus.untested:
             return Verdict(XrayStatus.TODO, 'Untested')
-        if result.status == ScenarioStatus.skipped:
+        if step.status == ScenarioStatus.skipped:
             return Verdict(XrayStatus.ABORTED, self.current_scenario.skip_reason)
 
-    def result(self, result):
+    def result(self, step):
         if self.current_scenario.status == ScenarioStatus.untested:
             return
 
         if self.current_test_key is None:
             return
 
-        verdict = self.get_verdict(result)
+        verdict = self.get_verdict(step)
         self.testcases[self.current_test_key].statuses.append(verdict.status)
         if not self.is_scenario_outline():
             self.testcases[self.current_test_key].comment = verdict.message
 
-    def eof(self):
+    def eof(self) -> None:
         """End of feature"""
         if self.config.dry_run:
             return
 
+        self.collect_tests()
+        if self.test_execution.tests:
+            self.xray_publisher.publish(self.test_execution.as_dict())
+        self.test_execution.flush()
+        self.reset()
+
+    def collect_tests(self) -> None:
         for tc_id, tc_status in self.testcases.items():
             testcase = TestCase(test_key=tc_id)
             if tc_status.is_outline:
@@ -116,8 +124,3 @@ class XrayFormatter(Formatter):
                 testcase.status = tc_status.statuses[0]
                 testcase.comment = tc_status.comment
             self.test_execution.append(testcase)
-
-        if self.test_execution.tests:
-            self.xray_publisher.publish(self.test_execution.as_dict())
-        self.test_execution.flush()
-        self.reset()
