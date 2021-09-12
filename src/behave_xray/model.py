@@ -59,7 +59,7 @@ class TestCase:
             testKey=self.test_key,
             status=self.status,
             comment=self.comment,
-            examples=[example.name for example in self.examples]
+            examples=self.examples
         )
 
 

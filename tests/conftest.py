@@ -11,6 +11,11 @@ def http_server():
         {'testExecIssue': {'key': 'JIRA-1000'}},
         methods=('POST',)
     )
+    server.add_callback_response(
+        '/api/v2/authenticate',
+        lambda: 'token',
+        methods=('POST',)
+    )
     server.start()
     yield
     server.shutdown_server()

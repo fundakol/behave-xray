@@ -72,3 +72,14 @@ def test_test_execution_output_dictionary_with_test_execution_id(testcase):
                                            'examples': [],
                                            'status': 'PASS',
                                            'testKey': 'JIRA-1'}]}
+
+
+def test_test_case_status_validation():
+    with pytest.raises(ValueError):
+        _TestCase('Jira-1', status='TO-DO')
+
+
+def test_test_case_status_validation_for_assigning():
+    test_case = _TestCase('Jira-1')
+    with pytest.raises(ValueError):
+        test_case.status = 'TO-DO'
