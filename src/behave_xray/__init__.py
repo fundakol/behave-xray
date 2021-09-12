@@ -1,1 +1,1 @@
-from .formatter import XrayFormatter
+from .formatter import XrayFormatter, XrayCloudFormatter
