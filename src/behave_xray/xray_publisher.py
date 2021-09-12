@@ -4,18 +4,11 @@ from typing import Union
 import requests
 from requests.auth import AuthBase
 
+from behave_xray.exceptions import XrayError
+
 TEST_EXECUTION_ENDPOINT = '/rest/raven/2.0/import/execution'
 
-logging.basicConfig()
 _logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
-
-
-class XrayError(Exception):
-    """Custom exception for Jira XRAY"""
-
-    def __init__(self, message=''):
-        self.message = message
 
 
 class XrayPublisher:
