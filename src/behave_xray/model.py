@@ -36,7 +36,7 @@ class TestCase:
             testKey=self.test_key,
             status=self.status.name,
             comment=self.comment,
-            examples=[example.name for example in self.examples]
+            examples=self.examples
         )
 
     def __repr__(self):
