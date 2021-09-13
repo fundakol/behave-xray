@@ -31,8 +31,8 @@ Feature: showing off behave
       Then behave will test it for us!
 ```
 
-Set system environments (Basic authentication):
-```shell
+Set system environments (Basic authentication) for Xray Server/DC:
+```commandline
 export XRAY_API_BASE_URL=<jira URL>
 export XRAY_API_USER=<jria username>
 export XRAY_API_PASSWORD=<user password>
@@ -41,5 +41,32 @@ export XRAY_API_PASSWORD=<user password>
 Run tests:
 
 ```commandline
-behave . -f behave_xray.formatter:XrayFormatter
+behave -f behave_xray:XrayFormatter
+```
+
+Set system environments (Bearer authentication) for Xray Cloud:
+```commandline
+export XRAY_API_BASE_URL=<jira URL>
+export XRAY_CLIENT_ID=<Xray client id>
+export XRAY_CLIENT_SECRET=<Xray client secret>
+```
+
+Run tests:
+
+```commandline
+behave -f behave_xray:XrayCloudFormatter
+```
+
+You can register formatter in behave.ini:
+
+```ini
+# -- FILE: behave.ini
+[behave.formatters]
+xray = behave_xray:XrayCloudFormatter
+```
+
+and use with shorter name:
+
+```commandline
+behave --f xray
 ```

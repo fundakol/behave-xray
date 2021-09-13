@@ -1,46 +1,80 @@
 import datetime as dt
-import enum
 from typing import Dict, List, Union, Any
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
 
-class XrayStatus(str, enum.Enum):
-    TODO = 'TODO'
-    EXECUTING = 'EXECUTING'
-    PENDING = 'PENDING'
-    PASS = 'PASS'
-    FAIL = 'FAIL'
-    ABORTED = 'ABORTED'
-    BLOCKED = 'BLOCKED'
-
-
 class TestCase:
+    """Class represents Test Case."""
+    VALID_STATUSES = (
+        'TODO',
+        'ABORTED',
+        'PASS',
+        'FAIL',
+        'EXECUTING',
+        'PENDING',
+        'BLOCKED'
+    )
 
     def __init__(
             self,
             test_key: str = None,
-            status: str = XrayStatus.TODO,
-            comment: str = None,
-            examples: list = None,
+            status: str = 'TODO',
+            comment: str = '',
+            examples: List[str] = None,
             duration: float = 0.0,
     ):
+        """
+        :param test_key: Test Case ID
+        :param status: Status
+        :param comment: Comment
+        :param examples: Outline tests results
+        :param duration: Duration
+        """
         self.test_key = test_key
-        self.status = XrayStatus(status)
-        self.comment = comment or ''
+        self.status = status
+        self.comment = comment
         self.examples = examples or []
         self.duration = duration
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(test_key='{self.test_key}', status='{self.status}')"
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, value: str):
+        self._validate_status(value)
+        self._status = value
+
+    def _validate_status(self, status: str):
+        if status not in self.VALID_STATUSES:
+            raise ValueError(f'Status must be one of {", ".join(self.VALID_STATUSES)}, but was {status}')
+
     def as_dict(self) -> Dict[str, str]:
+        """Serialize Test Case."""
         return dict(
             testKey=self.test_key,
-            status=self.status.name,
+            status=self.status,
             comment=self.comment,
             examples=self.examples
         )
 
-    def __repr__(self):
-        return f"{self.__class__.__name__}(test_key='{self.test_key}', status='{self.status}')"
+
+class TestCaseCloud(TestCase):
+    """Class represents Test Case."""
+
+    VALID_STATUSES = (
+        'TODO',
+        'ABORTED',
+        'PASSED',
+        'FAILED',
+        'EXECUTING',
+        'PENDING',
+        'BLOCKED'
+    )
 
 
 class TestExecution:
