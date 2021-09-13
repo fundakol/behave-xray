@@ -106,10 +106,7 @@ class _XrayFormatterBase(Formatter):
             return
 
         verdict = self.get_verdict(step)
-        self.testcases[self.current_test_key].statuses.append(
-            # self._get_xray_status(verdict.status.name)
-            verdict.status
-        )
+        self.testcases[self.current_test_key].statuses.append(verdict.status)
         if not self.is_scenario_outline():
             self.testcases[self.current_test_key].comment = verdict.message
 
@@ -147,7 +144,7 @@ class XrayFormatter(_XrayFormatterBase):
         'skipped': 'ABORTED',
         'passed': 'PASS',
         'failed': 'FAIL',
-        'undefined': 'TODO',
+        'undefined': 'FAIL',  # a step is not implemented
         'executing': 'EXECUTING'
     }
 
@@ -169,7 +166,7 @@ class XrayCloudFormatter(_XrayFormatterBase):
         'skipped': 'ABORTED',
         'passed': 'PASSED',
         'failed': 'FAILED',
-        'undefined': 'TODO',
+        'undefined': 'FAILED',  # a step is not implemented
         'executing': 'EXECUTING'
     }
 
