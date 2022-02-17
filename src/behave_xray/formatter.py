@@ -14,7 +14,11 @@ from behave_xray.helper import (
     get_overall_status
 )
 from behave_xray.model import TestExecution, TestCase, TestCaseCloud
-from behave_xray.xray_publisher import XrayPublisher
+from behave_xray.xray_publisher import (
+    XrayPublisher,
+    TEST_EXECUTION_ENDPOINT,
+    TEST_EXECUTION_ENDPOINT_CLOUD
+)
 
 
 @dataclass
@@ -153,7 +157,7 @@ class XrayFormatter(_XrayFormatterBase):
         user = environ["XRAY_API_USER"]
         password = environ["XRAY_API_PASSWORD"]
         auth = (user, password)
-        publisher = XrayPublisher(base_url=jira_url, auth=auth)
+        publisher = XrayPublisher(base_url=jira_url, endpoint=TEST_EXECUTION_ENDPOINT, auth=auth)
         super().__init__(stream, config, publisher)
 
 
@@ -175,7 +179,7 @@ class XrayCloudFormatter(_XrayFormatterBase):
         client_id = environ["XRAY_CLIENT_ID"]
         client_secret = environ["XRAY_CLIENT_SECRET"]
         auth = BearerAuth(base_url=jira_url, client_id=client_id, client_secret=client_secret)
-        publisher = XrayPublisher(base_url=jira_url, auth=auth)
+        publisher = XrayPublisher(base_url=jira_url, endpoint=TEST_EXECUTION_ENDPOINT_CLOUD, auth=auth)
         super().__init__(stream, config, publisher)
 
     @staticmethod
