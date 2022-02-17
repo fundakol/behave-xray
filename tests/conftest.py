@@ -3,7 +3,7 @@ import pytest
 from tests.mock_server import MockServer
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope='session', autouse=True)
 def http_server():
     server = MockServer(5002)
     server.add_json_response(

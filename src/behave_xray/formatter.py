@@ -153,9 +153,9 @@ class XrayFormatter(_XrayFormatterBase):
     }
 
     def __init__(self, stream, config):
-        jira_url = environ["XRAY_API_BASE_URL"]
-        user = environ["XRAY_API_USER"]
-        password = environ["XRAY_API_PASSWORD"]
+        jira_url = environ['XRAY_API_BASE_URL']
+        user = environ['XRAY_API_USER']
+        password = environ['XRAY_API_PASSWORD']
         auth = (user, password)
         publisher = XrayPublisher(base_url=jira_url, endpoint=TEST_EXECUTION_ENDPOINT, auth=auth)
         super().__init__(stream, config, publisher)
@@ -175,9 +175,9 @@ class XrayCloudFormatter(_XrayFormatterBase):
     }
 
     def __init__(self, stream, config):
-        jira_url = environ["XRAY_API_BASE_URL"]
-        client_id = environ["XRAY_CLIENT_ID"]
-        client_secret = environ["XRAY_CLIENT_SECRET"]
+        jira_url = environ['XRAY_API_BASE_URL']
+        client_id = environ['XRAY_CLIENT_ID']
+        client_secret = environ['XRAY_CLIENT_SECRET']
         auth = BearerAuth(base_url=jira_url, client_id=client_id, client_secret=client_secret)
         publisher = XrayPublisher(base_url=jira_url, endpoint=TEST_EXECUTION_ENDPOINT_CLOUD, auth=auth)
         super().__init__(stream, config, publisher)

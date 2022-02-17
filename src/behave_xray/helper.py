@@ -25,7 +25,7 @@ def get_testcase_key_from_tag(tag: str) -> Optional[str]:
     if match:
         return match.group(2)
     # for outline scenario
-    match = re.match(r"^(allure|jira)\.testcase(.+)$", tag, flags=re.IGNORECASE)
+    match = re.match(r'^(allure|jira)\.testcase(.+)$', tag, flags=re.IGNORECASE)
     if match:
         return match.group(2)
     else:
