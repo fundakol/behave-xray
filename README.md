@@ -1,7 +1,7 @@
 # behave-xray
 
 [![PyPi](https://img.shields.io/pypi/v/behave-xray.png)](https://pypi.python.org/pypi/behave-xray)
-[![Build Status](https://travis-ci.com/fundakol/behave-xray.svg?branch=master)](https://travis-ci.com/github/fundakol/behave-xray)
+[![Build Status](https://github.com/fundakol/behave-xray/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/fundakol/behave-xray/actions?query=workflow?master)
 
 ### Installation
 
