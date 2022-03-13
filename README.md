@@ -10,7 +10,7 @@
 pip install -U behave-xray
 ```
 
-or 
+or from the source:
 
 ```commandline
 python setup.py install
@@ -29,9 +29,20 @@ Feature: showing off behave
      Given we have behave installed
       When we implement a test
       Then behave will test it for us!
+  
+  @jira.testcase('JIRA-2')
+  Scenario Outline: Add two numbers in Calc
+    Given Calculator is open
+    When I add <a> and <b>
+    Then result is <result>
+
+  Examples: Sum
+      | a | b  | result |
+      | 3 | 4  | 7      |
+      | 6 | 10 | 18     |
 ```
 
-Set system environments (Basic authentication) for Xray Server/DC:
+Set system environments (Basic authentication) for [Xray Server+DC](https://docs.getxray.app/display/XRAY/REST+API):
 ```commandline
 export XRAY_API_BASE_URL=<jira URL>
 export XRAY_API_USER=<jria username>
@@ -44,7 +55,7 @@ Run tests:
 behave -f behave_xray:XrayFormatter
 ```
 
-Set system environments (Bearer authentication) for Xray Cloud:
+Set system environments (Bearer authentication) for [Xray Cloud](https://docs.getxray.app/display/XRAYCLOUD/REST+API):
 ```commandline
 export XRAY_API_BASE_URL=<jira URL>
 export XRAY_CLIENT_ID=<Xray client id>
