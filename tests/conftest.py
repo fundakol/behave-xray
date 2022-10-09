@@ -21,6 +21,12 @@ def http_server():
         {'testExecIssue': {'key': 'JIRA-1000'}},
         methods=('POST',)
     )
+    # cloud jira:
+    server.add_json_response(
+        '/api/v2/import/execution',
+        {'testExecIssue': {'key': 'JIRA-1000'}},
+        methods=('POST',)
+    )
     server.add_callback_response(
         '/api/v2/authenticate',
         lambda: 'token',

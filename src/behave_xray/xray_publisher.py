@@ -23,7 +23,7 @@ class XrayPublisher:
 
     @property
     def endpoint_url(self) -> str:
-        return self.base_url + TEST_EXECUTION_ENDPOINT
+        return self.base_url + self.endpoint
 
     def publish_xray_results(self, url: str, auth: AuthBase, data: dict) -> dict:
         headers = {
@@ -40,11 +40,16 @@ class XrayPublisher:
             try:
                 response.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                _logger.error('HTTPError: Could not post to JIRA service %s. Response status code: %s',
-                              self.base_url, response.status_code)
-                _logger.error('Response error: %s', response.json())
-                raise XrayError from e
-            return response.json()
+                err_message = (f'HTTPError: Could not post to JIRA service at {url}. '
+                               f'Response status code: {response.status_code}')
+                _logger.exception(err_message)
+                if 'error' in response.json():
+                    server_return_error = f"Error message from server: {response.json()['error']}"
+                    err_message += '\n' + server_return_error
+                    _logger.error(server_return_error)
+                raise XrayError(err_message) from e
+            else:
+                return response.json()
 
     def publish(self, test_execution: dict) -> bool:
         try:
