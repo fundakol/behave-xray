@@ -1,11 +1,11 @@
-from behave import *
+from behave import when, then
 
 
 @when('I add {a:g} and {b:g}')
-def step_impl(context, a, b):
+def step_impl(context, a, b):  # noqa: F811
     context.result = a + b
 
 
 @then('result is {result:g}')
-def step_impl(context, result):
+def step_impl(context, result):  # noqa: F811
     assert context.result == result, 'Not equal'
