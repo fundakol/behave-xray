@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from behave.formatter.base import Formatter
 from behave.model import Status
 
-from behave_xray.bearer_auth import BearerAuth, TokenAuth
+from behave_xray.authentication import BearerAuth, TokenAuth
 from behave_xray.helper import (
     get_overall_status,
     get_test_execution_key_from_tag,
