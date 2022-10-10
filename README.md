@@ -64,8 +64,7 @@ $ export XRAY_CLIENT_SECRET=<Xray client secret>
 
 Set system environments for token authentication:
 ```shell
-$ export XRAY_API_BASE_URL=<jira URL>
-$ export XRAY_TOKEN=<token>
+$ export XRAY_TOKEN=<Xray token>
 ```
 
 
@@ -77,7 +76,7 @@ Run tests against [Jira Xray Server+DC](https://docs.getxray.app/display/XRAY/RE
 $ behave -f behave_xray:XrayFormatter
 ```
 
-Run tests against [Jira Xray Cloud](https://docs.getxray.app/display/XRAYCLOUD/REST+API) serveer:
+Run tests against [Jira Xray Cloud](https://docs.getxray.app/display/XRAYCLOUD/REST+API) server:
 
 ```shell
 $ behave -f behave_xray:XrayCloudFormatter
