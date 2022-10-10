@@ -45,3 +45,14 @@ class BearerAuth(AuthBase):
             auth_token = response.text
             r.headers['Authorization'] = f'Bearer {auth_token}'
         return r
+
+
+class TokenAuth(AuthBase):
+    """Bearer Token Authentication"""
+
+    def __init__(self, token: str) -> None:
+        self._token = token
+
+    def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
+        r.headers['authorization'] = f'Bearer {self._token}'
+        return r
