@@ -15,12 +15,12 @@ or from the source:
 ```commandline
 python setup.py install
 ```
-### Usage 
+### Usage
 
 Add JIRA tags to Gherkin scenario:
 
 ```gherkin
-# --FILE: tutorial.feature 
+# --FILE: tutorial.feature
 @jira.test_plan('JIRA-3')
 Feature: showing off behave
 
@@ -29,7 +29,7 @@ Feature: showing off behave
      Given we have behave installed
       When we implement a test
       Then behave will test it for us!
-  
+
   @jira.testcase('JIRA-2')
   Scenario Outline: Add two numbers in Calc
     Given Calculator is open
@@ -42,31 +42,47 @@ Feature: showing off behave
       | 6 | 10 | 18     |
 ```
 
-Set system environments (Basic authentication) for [Xray Server+DC](https://docs.getxray.app/display/XRAY/REST+API):
-```commandline
-export XRAY_API_BASE_URL=<jira URL>
-export XRAY_API_USER=<jria username>
-export XRAY_API_PASSWORD=<user password>
+### Configure Jira URL and authentication
+
+Set Jira server API base URL in system environments:
+
+```shell
+$ export XRAY_API_BASE_URL=<jira URL>
 ```
 
-Run tests:
-
-```commandline
-behave -f behave_xray:XrayFormatter
+Set system environments for Basic authentication:
+```shell
+$ export XRAY_API_USER=<jira username>
+$ export XRAY_API_PASSWORD=<user password>
 ```
 
-Set system environments (Bearer authentication) for [Xray Cloud](https://docs.getxray.app/display/XRAYCLOUD/REST+API):
-```commandline
-export XRAY_API_BASE_URL=<jira URL>
-export XRAY_CLIENT_ID=<Xray client id>
-export XRAY_CLIENT_SECRET=<Xray client secret>
+Set system environments Bearer authentication:
+```shell
+$ export XRAY_CLIENT_ID=<Xray client id>
+$ export XRAY_CLIENT_SECRET=<Xray client secret>
 ```
 
-Run tests:
-
-```commandline
-behave -f behave_xray:XrayCloudFormatter
+Set system environments for token authentication:
+```shell
+$ export XRAY_API_BASE_URL=<jira URL>
+$ export XRAY_TOKEN=<token>
 ```
+
+
+### Run tests
+
+Run tests against [Jira Xray Server+DC](https://docs.getxray.app/display/XRAY/REST+API):
+
+```shell
+$ behave -f behave_xray:XrayFormatter
+```
+
+Run tests against [Jira Xray Cloud](https://docs.getxray.app/display/XRAYCLOUD/REST+API) serveer:
+
+```shell
+$ behave -f behave_xray:XrayCloudFormatter
+```
+
 
 You can register formatter in behave.ini:
 
