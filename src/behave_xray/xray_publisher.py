@@ -1,5 +1,5 @@
 import logging
-from typing import Union
+from typing import Union, Tuple
 
 import requests
 from requests.auth import AuthBase
@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 
 class XrayPublisher:
 
-    def __init__(self, base_url: str, endpoint: str, auth: Union[AuthBase, tuple]) -> None:
+    def __init__(self, base_url: str, endpoint: str, auth: Union[AuthBase, Tuple[str, str]]) -> None:
         if base_url.endswith('/'):
             base_url = base_url[:-1]
         self.base_url = base_url
@@ -25,7 +25,7 @@ class XrayPublisher:
     def endpoint_url(self) -> str:
         return self.base_url + self.endpoint
 
-    def publish_xray_results(self, url: str, auth: AuthBase, data: dict) -> dict:
+    def publish_xray_results(self, url: str, auth: Union[AuthBase, Tuple[str, str]], data: dict) -> dict:
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
