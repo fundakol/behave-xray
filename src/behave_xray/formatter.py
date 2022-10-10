@@ -201,8 +201,8 @@ class XrayCloudFormatter(_XrayFormatterBase):
 @dataclass
 class JiraConfig:
     jira_url: str
-    user_name: str
-    user_password: str
+    user_name: str = ''
+    user_password: str = ''
     client_id: str = ''
     client_secret: str = ''
     token: str = ''
