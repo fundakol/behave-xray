@@ -2,6 +2,7 @@
 
 [![PyPi](https://img.shields.io/pypi/v/behave-xray.png)](https://pypi.python.org/pypi/behave-xray)
 [![Build Status](https://github.com/fundakol/behave-xray/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/fundakol/behave-xray/actions?query=workflow?master)
+[![codecov](https://codecov.io/gh/fundakol/behave-xray/branch/master/graph/badge.svg?token=VV1DMT3605)](https://codecov.io/gh/fundakol/behave-xray)
 
 ### Installation
 
@@ -15,12 +16,12 @@ or from the source:
 ```commandline
 python setup.py install
 ```
-### Usage 
+### Usage
 
 Add JIRA tags to Gherkin scenario:
 
 ```gherkin
-# --FILE: tutorial.feature 
+# --FILE: tutorial.feature
 @jira.test_plan('JIRA-3')
 Feature: showing off behave
 
@@ -29,7 +30,7 @@ Feature: showing off behave
      Given we have behave installed
       When we implement a test
       Then behave will test it for us!
-  
+
   @jira.testcase('JIRA-2')
   Scenario Outline: Add two numbers in Calc
     Given Calculator is open
