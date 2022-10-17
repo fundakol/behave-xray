@@ -1,15 +1,21 @@
 import datetime as dt
+import os
+from unittest import mock
 from unittest.mock import MagicMock, patch
 
 import pytest
 from behave.model_core import Status
-
-from behave_xray.formatter import XrayFormatter, ScenarioOutline, XrayCloudFormatter
+from behave_xray.formatter import (
+    ScenarioOutline,
+    XrayCloudFormatter,
+    XrayFormatter,
+    _get_jira_config,
+)
 from behave_xray.helper import (
+    get_overall_status,
     get_test_execution_key_from_tag,
     get_test_plan_key_from_tag,
     get_testcase_key_from_tag,
-    get_overall_status
 )
 
 
@@ -223,3 +229,63 @@ def test_xray_cloud_formatter_return_correct_dictionary():
         }
 
         assert formatter.test_execution.as_dict() == expected_output
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        'XRAY_API_BASE_URL': 'http:localhost',
+        'XRAY_API_USER': 'username',
+        'XRAY_API_PASSWORD': 'password'
+    },
+    clear=True
+)
+def test_get_jira_config_returns_basic_auth():
+    config = _get_jira_config()
+    assert config.auth_method == 'basic'
+    assert config.user_name == 'username'
+    assert config.user_password == 'password'
+
+
+@mock.patch.dict(
+    os.environ,
+    {'XRAY_API_BASE_URL': 'http:localhost', 'XRAY_TOKEN': 'token'},
+    clear=True
+)
+def test_get_jira_config_returns_token_auth():
+    config = _get_jira_config()
+    assert config.auth_method == 'token'
+    assert config.token == 'token'
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        'XRAY_API_BASE_URL': 'http:localhost',
+        'XRAY_CLIENT_ID': 'client_id',
+        'XRAY_CLIENT_SECRET': 'secret'
+    },
+    clear=True
+)
+def test_get_jira_config_returns_bearer_auth():
+    config = _get_jira_config()
+    assert config.auth_method == 'bearer'
+    assert config.client_id == 'client_id'
+    assert config.client_secret == 'secret'
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        'XRAY_API_BASE_URL': 'http:localhost',
+        'XRAY_API_USER': 'username',
+        'XRAY_API_PASSWORD': 'password',
+        'XRAY_CLIENT_ID': 'client_id',
+        'XRAY_CLIENT_SECRET': 'secret',
+        'XRAY_TOKEN': 'token'
+    },
+    clear=True
+)
+def test_get_jira_config_returns_bearer_auth_before_others():
+    config = _get_jira_config()
+    assert config.auth_method == 'bearer'
