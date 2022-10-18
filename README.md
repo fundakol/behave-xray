@@ -7,14 +7,14 @@
 ### Installation
 
 
-```commandline
-pip install -U behave-xray
+```shell
+$ pip install -U behave-xray
 ```
 
 or from the source:
 
-```commandline
-python setup.py install
+```shell
+$ python setup.py install
 ```
 ### Usage
 
@@ -79,6 +79,6 @@ xray = behave_xray:XrayCloudFormatter
 
 and use with shorter name:
 
-```commandline
-behave --f xray
+```shell
+$ behave --f xray
 ```
