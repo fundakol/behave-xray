@@ -1,5 +1,7 @@
 @jira.test_plan('JIRA-1')
 Feature: Calculator
+  description
+  further description
 
   @allure.testcase('JIRA-31')
   Scenario: Add two numbers should pass

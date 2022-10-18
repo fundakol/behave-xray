@@ -64,6 +64,7 @@ class _XrayFormatterBase(Formatter):
         if not feature.tags:
             return
 
+        self.test_execution.description = '\n'.join(feature.description)
         for tag in feature.tags:
             test_exec_key = get_test_execution_key_from_tag(tag)
             if test_exec_key:
