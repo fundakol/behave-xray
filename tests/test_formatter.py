@@ -74,6 +74,7 @@ def test_overall_status(statuses, expected_status):
 def test_xray_formatter_return_correct_dictionary():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
@@ -113,6 +114,7 @@ def test_xray_formatter_return_correct_dictionary():
 def test_xray_formatter_returns_correct_dictionary():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
@@ -152,6 +154,7 @@ def test_xray_formatter_returns_correct_dictionary():
 def test_xray_formatter_returns_correct_dictionary_for_outline_scenario():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
@@ -198,6 +201,7 @@ def test_xray_formatter_returns_correct_dictionary_for_outline_scenario():
 def test_xray_cloud_formatter_return_correct_dictionary():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
