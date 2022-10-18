@@ -2,8 +2,10 @@ import datetime as dt
 from unittest.mock import patch
 
 import pytest
-from behave_xray.formatter import TestExecution as _TestExecution
+
 from behave_xray.formatter import TestCase as _TestCase
+from behave_xray.formatter import TestExecution as _TestExecution
+from behave_xray.model import DEFAULT_SUMMARY
 
 
 @pytest.fixture
@@ -35,12 +37,22 @@ def test_test_execution_output_dictionary(testcase):
         dt_mock.now.return_value = testdt
         te = _TestExecution()
         te.tests = [testcase]
-        assert te.as_dict() == {'info': {'finishDate': '2021-04-23T16:30:02+0000',
-                                         'startDate': '2021-04-23T16:30:02+0000'},
-                                'tests': [{'comment': 'Test',
-                                           'examples': [],
-                                           'status': 'PASS',
-                                           'testKey': 'JIRA-1'}]}
+        assert te.as_dict() == {
+            'info': {
+                'finishDate': '2021-04-23T16:30:02+0000',
+                'startDate': '2021-04-23T16:30:02+0000',
+                'summary': DEFAULT_SUMMARY,
+                'description': ''
+            },
+            'tests': [
+                {
+                    'comment': 'Test',
+                    'examples': [],
+                    'status': 'PASS',
+                    'testKey': 'JIRA-1'
+                }
+            ]
+        }
 
 
 def test_test_execution_output_dictionary_with_test_plan_id(testcase):
@@ -49,13 +61,21 @@ def test_test_execution_output_dictionary_with_test_plan_id(testcase):
         dt_mock.now.return_value = testdt
         te = _TestExecution(test_plan_key='Jira-10')
         te.tests = [testcase]
-        assert te.as_dict() == {'info': {'finishDate': '2021-04-23T16:30:02+0000',
-                                         'startDate': '2021-04-23T16:30:02+0000',
-                                         'testPlanKey': 'Jira-10'},
-                                'tests': [{'comment': 'Test',
-                                           'examples': [],
-                                           'status': 'PASS',
-                                           'testKey': 'JIRA-1'}]}
+        assert te.as_dict() == {
+            'info': {'finishDate': '2021-04-23T16:30:02+0000',
+                     'startDate': '2021-04-23T16:30:02+0000',
+                     'summary': DEFAULT_SUMMARY,
+                     'description': '',
+                     'testPlanKey': 'Jira-10'},
+            'tests': [
+                {
+                    'comment': 'Test',
+                    'examples': [],
+                    'status': 'PASS',
+                    'testKey': 'JIRA-1'
+                }
+            ]
+        }
 
 
 def test_test_execution_output_dictionary_with_test_execution_id(testcase):
@@ -64,14 +84,22 @@ def test_test_execution_output_dictionary_with_test_execution_id(testcase):
         dt_mock.now.return_value = testdt
         te = _TestExecution(test_plan_key='Jira-10', test_execution_key='JIRA-20')
         te.tests = [testcase]
-        assert te.as_dict() == {'testExecutionKey': 'JIRA-20',
-                                'info': {'finishDate': '2021-04-23T16:30:02+0000',
-                                         'startDate': '2021-04-23T16:30:02+0000',
-                                         'testPlanKey': 'Jira-10'},
-                                'tests': [{'comment': 'Test',
-                                           'examples': [],
-                                           'status': 'PASS',
-                                           'testKey': 'JIRA-1'}]}
+        assert te.as_dict() == {
+            'testExecutionKey': 'JIRA-20',
+            'info': {'finishDate': '2021-04-23T16:30:02+0000',
+                     'startDate': '2021-04-23T16:30:02+0000',
+                     'summary': DEFAULT_SUMMARY,
+                     'description': '',
+                     'testPlanKey': 'Jira-10'},
+            'tests': [
+                {
+                    'comment': 'Test',
+                    'examples': [],
+                    'status': 'PASS',
+                    'testKey': 'JIRA-1'
+                }
+            ]
+        }
 
 
 def test_test_case_status_validation():

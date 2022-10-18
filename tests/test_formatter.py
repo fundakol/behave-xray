@@ -1,16 +1,24 @@
 import datetime as dt
-from unittest.mock import MagicMock, patch
+from unittest.mock import (
+    MagicMock,
+    patch,
+)
 
 import pytest
 from behave.model_core import Status
 
-from behave_xray.formatter import XrayFormatter, ScenarioOutline, XrayCloudFormatter
+from behave_xray.formatter import (
+    ScenarioOutline,
+    XrayCloudFormatter,
+    XrayFormatter,
+)
 from behave_xray.helper import (
+    get_overall_status,
     get_test_execution_key_from_tag,
     get_test_plan_key_from_tag,
     get_testcase_key_from_tag,
-    get_overall_status
 )
+from behave_xray.model import DEFAULT_SUMMARY
 
 
 @pytest.mark.parametrize(
@@ -66,6 +74,7 @@ def test_overall_status(statuses, expected_status):
 def test_xray_formatter_return_correct_dictionary():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
@@ -79,7 +88,9 @@ def test_xray_formatter_return_correct_dictionary():
         expected_output = {
             'info': {
                 'finishDate': '2021-04-23T16:30:02+0000',
-                'startDate': '2021-04-23T16:30:02+0000'
+                'startDate': '2021-04-23T16:30:02+0000',
+                'summary': DEFAULT_SUMMARY,
+                'description': '',
             },
             'tests': [
                 {
@@ -103,6 +114,7 @@ def test_xray_formatter_return_correct_dictionary():
 def test_xray_formatter_returns_correct_dictionary():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
@@ -116,7 +128,9 @@ def test_xray_formatter_returns_correct_dictionary():
         expected_output = {
             'info': {
                 'finishDate': '2021-04-23T16:30:02+0000',
-                'startDate': '2021-04-23T16:30:02+0000'
+                'startDate': '2021-04-23T16:30:02+0000',
+                'summary': DEFAULT_SUMMARY,
+                'description': '',
             },
             'tests': [
                 {
@@ -140,6 +154,7 @@ def test_xray_formatter_returns_correct_dictionary():
 def test_xray_formatter_returns_correct_dictionary_for_outline_scenario():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
@@ -160,7 +175,9 @@ def test_xray_formatter_returns_correct_dictionary_for_outline_scenario():
         expected_output = {
             'info': {
                 'finishDate': '2021-04-23T16:30:02+0000',
-                'startDate': '2021-04-23T16:30:02+0000'
+                'startDate': '2021-04-23T16:30:02+0000',
+                'summary': DEFAULT_SUMMARY,
+                'description': '',
             },
             'tests': [
                 {
@@ -184,6 +201,7 @@ def test_xray_formatter_returns_correct_dictionary_for_outline_scenario():
 def test_xray_cloud_formatter_return_correct_dictionary():
     mock_stream = MagicMock()
     mock_config = MagicMock()
+    mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
@@ -204,7 +222,9 @@ def test_xray_cloud_formatter_return_correct_dictionary():
         expected_output = {
             'info': {
                 'finishDate': '2021-04-23T16:30:02+0000',
-                'startDate': '2021-04-23T16:30:02+0000'
+                'startDate': '2021-04-23T16:30:02+0000',
+                'summary': DEFAULT_SUMMARY,
+                'description': '',
             },
             'tests': [
                 {

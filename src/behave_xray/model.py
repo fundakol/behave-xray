@@ -1,7 +1,15 @@
 import datetime as dt
-from typing import Dict, List, Union, Any
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Union,
+)
 
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
+
+DATETIME_FORMAT: str = '%Y-%m-%dT%H:%M:%S%z'
+DEFAULT_SUMMARY: str = 'Execution of automated tests'
 
 
 class TestCase:
@@ -18,10 +26,10 @@ class TestCase:
 
     def __init__(
             self,
-            test_key: str = None,
+            test_key: str = '',
             status: str = 'TODO',
             comment: str = '',
-            examples: List[str] = None,
+            examples: Optional[List[str]] = None,
             duration: float = 0.0,
     ):
         """
@@ -81,11 +89,13 @@ class TestExecution:
 
     def __init__(
             self,
-            test_execution_key: str = None,
-            test_plan_key: str = None,
-            user: str = None,
-            revision: str = None,
-            tests: List[TestCase] = None
+            test_execution_key: str = '',
+            test_plan_key: str = '',
+            user: str = '',
+            revision: str = '',
+            summary: str = '',
+            description: str = '',
+            tests: Optional[List[TestCase]] = None
     ):
         """
         :param test_execution_key: Test execution Xray ID
@@ -95,9 +105,11 @@ class TestExecution:
         :param tests: list of Test Cases
         """
         self.test_execution_key = test_execution_key
-        self.test_plan_key = test_plan_key or ''
-        self.user = user or ''
-        self.revision = revision or ''
+        self.test_plan_key = test_plan_key
+        self.user = user
+        self.revision = revision
+        self.summary = summary or DEFAULT_SUMMARY
+        self.description = description
         self.start_date = dt.datetime.now(tz=dt.timezone.utc)
         self.tests = tests or []
 
@@ -119,7 +131,9 @@ class TestExecution:
         tests = [test.as_dict() for test in self.tests]
         info = dict(
             startDate=self.start_date.strftime(DATETIME_FORMAT),
-            finishDate=dt.datetime.now(tz=dt.timezone.utc).strftime(DATETIME_FORMAT)
+            finishDate=dt.datetime.now(tz=dt.timezone.utc).strftime(DATETIME_FORMAT),
+            summary=self.summary,
+            description=self.description
         )
         data = dict(info=info, tests=tests)
         if self.test_plan_key:
