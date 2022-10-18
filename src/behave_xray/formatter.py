@@ -49,8 +49,12 @@ class _XrayFormatterBase(Formatter):
         self.current_feature = None
         self.current_scenario = None
         self.current_test_key = None
-        self.test_execution: TestExecution = TestExecution()
+        self.test_execution: TestExecution = TestExecution(summary=self._get_summary())
         self.testcases: dict = defaultdict(lambda: ScenarioOutline())
+
+    def _get_summary(self) -> str:
+        userdata = self.config.userdata
+        return userdata.get('xray.summary', '')
 
     def reset(self):
         self.current_feature = None
