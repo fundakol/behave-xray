@@ -42,6 +42,6 @@ class BearerAuth(AuthBase):
             _logger.exception(err_message)
             raise XrayError(err_message) from exc
         else:
-            auth_token = response.text
+            auth_token = response.text.strip('"')
             r.headers['Authorization'] = f'Bearer {auth_token}'
         return r
