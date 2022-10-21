@@ -59,6 +59,10 @@ class XrayPublisher:
             _logger.error(e.message)
             return False
         else:
-            key = result['testExecIssue']['key']
+            _logger.debug('Publish returned: %s', result)
+            # XRAY Server+DC returns test execution information nested under 'testExecIssue'
+            # XRAY Cloud returns it directly
+            # Refer to XRAY API documentation for more details.
+            key = result['testExecIssue']['key'] if 'testExecIssue' in result else result['key']
             print('Uploaded results to JIRA XRAY Test Execution:', key)
             return True
