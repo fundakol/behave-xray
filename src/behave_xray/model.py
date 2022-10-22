@@ -93,6 +93,7 @@ class TestExecution:
             test_plan_key: str = '',
             user: str = '',
             revision: str = '',
+            version: str = '',
             summary: str = '',
             description: str = '',
             tests: Optional[List[TestCase]] = None
@@ -102,12 +103,16 @@ class TestExecution:
         :param test_plan_key: Test plan Xray ID
         :param user: Xray user
         :param revision: Revision
+        :param version: Version
+        :param summary: Summary
+        :param description: Description
         :param tests: list of Test Cases
         """
         self.test_execution_key = test_execution_key
         self.test_plan_key = test_plan_key
         self.user = user
         self.revision = revision
+        self.version = version
         self.summary = summary or DEFAULT_SUMMARY
         self.description = description
         self.start_date = dt.datetime.now(tz=dt.timezone.utc)
@@ -128,14 +133,21 @@ class TestExecution:
 
     def as_dict(self) -> Dict[str, Any]:
         """Serialize test execution."""
-        tests = [test.as_dict() for test in self.tests]
-        info = dict(
+        tests: List[Dict[str, str]] = [test.as_dict() for test in self.tests]
+        info: Dict[str, str] = dict(
             startDate=self.start_date.strftime(DATETIME_FORMAT),
             finishDate=dt.datetime.now(tz=dt.timezone.utc).strftime(DATETIME_FORMAT),
             summary=self.summary,
             description=self.description
         )
-        data = dict(info=info, tests=tests)
+        if self.user:
+            info['user'] = self.user
+        if self.version:
+            info['version'] = self.version
+        if self.revision:
+            info['revision'] = self.revision
+
+        data: Dict[str, Any] = dict(info=info, tests=tests)
         if self.test_plan_key:
             info['testPlanKey'] = self.test_plan_key
         if self.test_execution_key:
