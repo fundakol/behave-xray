@@ -44,34 +44,44 @@ Feature: showing off behave
       | 6 | 10 | 18     |
 ```
 
-Set system environments (Basic authentication) for [Xray Server+DC](https://docs.getxray.app/display/XRAY/REST+API):
+### Configure Jira URL and authentication
+
+Set Jira server API base URL in system environments:
+
 ```shell
 $ export XRAY_API_BASE_URL=<jira URL>
+```
+
+Set system environments for [basic authentication](https://developer.atlassian.com/server/jira/platform/basic-authentication/):
+
+```shell
 $ export XRAY_API_USER=<jria username>
 $ export XRAY_API_PASSWORD=<user password>
 ```
-
-Run tests:
-
+Set system environments for [Personal Access Tokens](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html) authentication:
 ```shell
-$ behave -f behave_xray:XrayFormatter
+$ export XRAY_TOKEN=<Xray token>
 ```
 
-Set system environments (Bearer authentication) for [Xray Cloud](https://docs.getxray.app/display/XRAYCLOUD/REST+API):
+Set system environments for Could server authentication with [Client ID and Client Secret](https://docs.getxray.app/display/XRAYCLOUD/Authentication+-+REST+v2):
 ```shell
-$ export XRAY_API_BASE_URL=<jira URL>
 $ export XRAY_CLIENT_ID=<Xray client id>
 $ export XRAY_CLIENT_SECRET=<Xray client secret>
 ```
 
-Run tests:
+### Run tests
 
+Run tests against [Jira Xray Server+DC](https://docs.getxray.app/display/XRAY/REST+API):
+```shell
+$ behave -f behave_xray:XrayFormatter
+```
+
+Run tests against [Jira Xray Cloud](https://docs.getxray.app/display/XRAYCLOUD/REST+API) server:
 ```shell
 $ behave -f behave_xray:XrayCloudFormatter
 ```
 
 You can register formatter in `behave.ini`:
-
 ```ini
 # -- FILE: behave.ini
 [behave.formatters]
@@ -79,7 +89,6 @@ xray = behave_xray:XrayCloudFormatter
 ```
 
 and use with shorter name:
-
 ```shell
 $ behave --f xray
 ```

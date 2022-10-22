@@ -1,20 +1,26 @@
 import subprocess
+import os
 
 import pytest
 
 
 @pytest.mark.parametrize(
-    'formatter',
+    'formatter, auth_type',
     [
-        'behave_xray:XrayFormatter',
-        'behave_xray:XrayCloudFormatter'
+        ('behave_xray:XrayFormatter', 'basic'),
+        ('behave_xray:XrayFormatter', 'token'),
+        ('behave_xray:XrayCloudFormatter', 'client_secret')
     ]
 )
-def test_if_xray_formatter_publishes_results(formatter):
+def test_if_xray_formatter_publishes_results(formatter, auth_type, auth):
+    env = dict(os.environ).copy()
+    env.update(auth(auth_type))
+
     process = subprocess.run(
         ['behave', 'tests', '-f', formatter],
         capture_output=True,
-        text=True
+        text=True,
+        env=env
     )
     assert not process.stderr
     assert 'Uploaded results to JIRA XRAY Test Execution: JIRA-1000' in process.stdout, process.stdout

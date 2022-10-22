@@ -9,8 +9,19 @@ from behave_xray.exceptions import XrayError
 _logger = logging.getLogger(__name__)
 
 
+class PersonalAccessTokenAuth(AuthBase):
+    """Personal access token authentication."""
+
+    def __init__(self, token: str) -> None:
+        self.token = token
+
+    def __call__(self, r: requests.PreparedRequest) -> requests.PreparedRequest:
+        r.headers['Authorization'] = f'Bearer {self.token}'
+        return r
+
+
 class BearerAuth(AuthBase):
-    """Bearer authentication for Xray Cloud."""
+    """Bearer authentication with Client Id and a Client Secret."""
 
     def __init__(self, base_url: str, client_id: str, client_secret: str) -> None:
         self.base_url = base_url

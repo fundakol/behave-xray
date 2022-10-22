@@ -1,12 +1,13 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
-from os import environ
-from typing import Dict, List
+from os import environ, getenv
+from typing import Dict, List, Optional
 
 from behave.formatter.base import Formatter
 from behave.model import Status
 
-from behave_xray.bearer_auth import BearerAuth
+from behave_xray.authentication import BearerAuth, PersonalAccessTokenAuth
+from behave_xray.exceptions import XrayError
 from behave_xray.helper import (
     get_test_execution_key_from_tag,
     get_test_plan_key_from_tag,
@@ -25,7 +26,7 @@ from behave_xray.xray_publisher import (
 class ScenarioOutline:
     """Class store Scenario Outline information."""
 
-    testcase_key: str = None
+    testcase_key: Optional[str] = None
     statuses: List[Status] = field(default_factory=list)
     comment: str = ''
     is_outline: bool = False
@@ -41,7 +42,7 @@ class _XrayFormatterBase(Formatter):
     name = 'xray'
     description = 'Jira XRAY formatter'
 
-    STATUS_MAPS: Dict[str, str] = None
+    STATUS_MAPS: Dict[str, str] = {}
 
     def __init__(self, stream, config, publisher: XrayPublisher):
         super().__init__(stream, config)
@@ -51,6 +52,20 @@ class _XrayFormatterBase(Formatter):
         self.current_test_key = None
         self.test_execution: TestExecution = TestExecution(summary=self._get_summary())
         self.testcases: dict = defaultdict(lambda: ScenarioOutline())
+
+    @staticmethod
+    def _get_auth(jira_config):
+        if jira_config.auth_method == 'bearer':
+            auth = BearerAuth(
+                base_url=jira_config.jira_url,
+                client_id=jira_config.client_id,
+                client_secret=jira_config.client_secret
+            )
+        elif jira_config.auth_method == 'token':
+            auth = PersonalAccessTokenAuth(token=jira_config.token)
+        else:
+            auth = (jira_config.user_name, jira_config.user_password)
+        return auth
 
     def _get_summary(self) -> str:
         userdata = self.config.userdata
@@ -120,7 +135,7 @@ class _XrayFormatterBase(Formatter):
             self.testcases[self.current_test_key].comment = verdict.message
 
     @staticmethod
-    def _get_test_case(test_key):
+    def _get_test_case(test_key) -> TestCase:
         return TestCase(test_key=test_key)
 
     def eof(self) -> None:
@@ -133,7 +148,7 @@ class _XrayFormatterBase(Formatter):
         self.test_execution.flush()
         self.reset()
 
-    def collect_tests(self):
+    def collect_tests(self) -> None:
         for tc_id, tc_status in self.testcases.items():
             testcase = self._get_test_case(test_key=tc_id)
             if tc_status.is_outline:
@@ -147,8 +162,9 @@ class _XrayFormatterBase(Formatter):
 
 class XrayFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray."""
+    endpoint: str = TEST_EXECUTION_ENDPOINT_CLOUD
 
-    STATUS_MAPS = {
+    STATUS_MAPS: Dict[str, str] = {
         'untested': 'TODO',
         'skipped': 'ABORTED',
         'passed': 'PASS',
@@ -158,17 +174,15 @@ class XrayFormatter(_XrayFormatterBase):
     }
 
     def __init__(self, stream, config):
-        jira_url = environ['XRAY_API_BASE_URL']
-        user = environ['XRAY_API_USER']
-        password = environ['XRAY_API_PASSWORD']
-        auth = (user, password)
-        publisher = XrayPublisher(base_url=jira_url, endpoint=TEST_EXECUTION_ENDPOINT, auth=auth)
+        jira_config = _get_jira_config()
+        auth = self._get_auth(jira_config=jira_config)
+        publisher = XrayPublisher(base_url=jira_config.jira_url, endpoint=self.endpoint, auth=auth)
         super().__init__(stream, config, publisher)
 
 
 class XrayCloudFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray Cloud."""
-
+    endpoint: str = TEST_EXECUTION_ENDPOINT
     name = 'xray-cloud'
     STATUS_MAPS = {
         'untested': 'TODO',
@@ -180,13 +194,50 @@ class XrayCloudFormatter(_XrayFormatterBase):
     }
 
     def __init__(self, stream, config):
-        jira_url = environ['XRAY_API_BASE_URL']
-        client_id = environ['XRAY_CLIENT_ID']
-        client_secret = environ['XRAY_CLIENT_SECRET']
-        auth = BearerAuth(base_url=jira_url, client_id=client_id, client_secret=client_secret)
-        publisher = XrayPublisher(base_url=jira_url, endpoint=TEST_EXECUTION_ENDPOINT_CLOUD, auth=auth)
+        jira_config = _get_jira_config()
+        auth = self._get_auth(jira_config=jira_config)
+        publisher = XrayPublisher(base_url=jira_config.jira_url, endpoint=self.endpoint, auth=auth)
         super().__init__(stream, config, publisher)
 
     @staticmethod
     def _get_test_case(test_key):
         return TestCaseCloud(test_key=test_key)
+
+
+@dataclass
+class JiraConfig:
+    jira_url: str
+    user_name: str = ''
+    user_password: str = ''
+    client_id: str = ''
+    client_secret: str = ''
+    token: str = ''
+
+    @property
+    def auth_method(self) -> str:
+        if self.client_id and self.client_id:
+            return 'bearer'  # client id & client secret
+        if self.token:
+            return 'token'
+        else:
+            return 'basic'
+
+
+def _get_jira_config() -> JiraConfig:
+    try:
+        jira_url = environ['XRAY_API_BASE_URL']
+    except KeyError:
+        raise XrayError('Environment variable `XRAY_API_BASE_URL` must be set')
+    user_name = getenv('XRAY_API_USER', '')
+    user_password = getenv('XRAY_API_PASSWORD', '')
+    client_id = getenv('XRAY_CLIENT_ID', '')
+    client_secret = getenv('XRAY_CLIENT_SECRET', '')
+    token = getenv('XRAY_TOKEN', '')
+    return JiraConfig(
+        user_name=user_name,
+        user_password=user_password,
+        jira_url=jira_url,
+        client_id=client_id,
+        client_secret=client_secret,
+        token=token
+    )
