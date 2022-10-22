@@ -50,7 +50,12 @@ class _XrayFormatterBase(Formatter):
         self.current_feature = None
         self.current_scenario = None
         self.current_test_key = None
-        self.test_execution: TestExecution = TestExecution(summary=self._get_summary())
+        self.test_execution: TestExecution = TestExecution(
+            summary=self._get_summary(),
+            user=self._get_user(),
+            revision=self._get_revision(),
+            version=self._get_version()
+        )
         self.testcases: dict = defaultdict(lambda: ScenarioOutline())
 
     @staticmethod
@@ -68,8 +73,16 @@ class _XrayFormatterBase(Formatter):
         return auth
 
     def _get_summary(self) -> str:
-        userdata = self.config.userdata
-        return userdata.get('xray.summary', '')
+        return self.config.userdata.get('xray.summary', '')
+
+    def _get_user(self) -> str:
+        return self.config.userdata.get('xray.user', '')
+
+    def _get_revision(self) -> str:
+        return self.config.userdata.get('xray.revision', '')
+
+    def _get_version(self) -> str:
+        return self.config.userdata.get('xray.version', '')
 
     def reset(self):
         self.current_feature = None

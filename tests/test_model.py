@@ -35,14 +35,22 @@ def test_test_execution_output_dictionary(testcase):
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
     with patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
-        te = _TestExecution()
+        te = _TestExecution(
+            description='This execution is automatically created',
+            user='admin',
+            version='v1.3',
+            revision='1.0.42134'
+        )
         te.tests = [testcase]
         assert te.as_dict() == {
             'info': {
                 'finishDate': '2021-04-23T16:30:02+0000',
                 'startDate': '2021-04-23T16:30:02+0000',
                 'summary': DEFAULT_SUMMARY,
-                'description': ''
+                'description': 'This execution is automatically created',
+                'version': 'v1.3',
+                'user': 'admin',
+                'revision': '1.0.42134',
             },
             'tests': [
                 {
