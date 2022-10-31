@@ -36,7 +36,8 @@ def test_test_plan_tag_parser(tag, jira_id):
      ("JIRA.TESTCASE('JIRA-10')", 'JIRA-10'),
      ('jira.testcase("JIRA-10")', 'JIRA-10'),
      ('jira.testcaseJIRA-10', 'JIRA-10'),  # outline scenario
-     ("allure.testcase('JIRA-10')", 'JIRA-10')]
+     ("allure.testcase('JIRA-10')", 'JIRA-10'),
+     ('@TEST_JIRA-10', 'JIRA-10')]  # exported from Xray Cucumber tests
 )
 def test_test_case_tag_parser(tag, jira_id):
     assert get_testcase_key_from_tag(tag) == jira_id
