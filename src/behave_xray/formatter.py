@@ -175,7 +175,7 @@ class _XrayFormatterBase(Formatter):
 
 class XrayFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray."""
-    endpoint: str = TEST_EXECUTION_ENDPOINT_CLOUD
+    endpoint: str = TEST_EXECUTION_ENDPOINT
 
     STATUS_MAPS: Dict[str, str] = {
         'untested': 'TODO',
@@ -195,7 +195,7 @@ class XrayFormatter(_XrayFormatterBase):
 
 class XrayCloudFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray Cloud."""
-    endpoint: str = TEST_EXECUTION_ENDPOINT
+    endpoint: str = TEST_EXECUTION_ENDPOINT_CLOUD
     name = 'xray-cloud'
     STATUS_MAPS = {
         'untested': 'TODO',
