@@ -10,6 +10,7 @@ from werkzeug.serving import make_server
 
 HOST = '127.0.0.1'
 
+
 class MockServer(Thread):
 
     def __init__(self, port=5000):
