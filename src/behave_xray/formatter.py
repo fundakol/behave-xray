@@ -93,10 +93,10 @@ class _XrayFormatterBase(Formatter):
 
     def feature(self, feature):
         self.current_feature = feature
-        if not feature.tags:
-            return
 
-        self.test_execution.description = '\n'.join(feature.description)
+        # description is a mandatory Xray field, use feature name if it doesn't have a description
+        description_text = '\n'.join(feature.description) if feature.description else feature.name
+        self.test_execution.description = description_text
         for tag in feature.tags:
             test_exec_key = get_test_execution_key_from_tag(tag)
             if test_exec_key:
@@ -175,7 +175,7 @@ class _XrayFormatterBase(Formatter):
 
 class XrayFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray."""
-    endpoint: str = TEST_EXECUTION_ENDPOINT_CLOUD
+    endpoint: str = TEST_EXECUTION_ENDPOINT
 
     STATUS_MAPS: Dict[str, str] = {
         'untested': 'TODO',
@@ -195,7 +195,7 @@ class XrayFormatter(_XrayFormatterBase):
 
 class XrayCloudFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray Cloud."""
-    endpoint: str = TEST_EXECUTION_ENDPOINT
+    endpoint: str = TEST_EXECUTION_ENDPOINT_CLOUD
     name = 'xray-cloud'
     STATUS_MAPS = {
         'untested': 'TODO',
