@@ -1,16 +1,44 @@
 import pytest
-import os
 
 from tests.mock_server import MockServer
 
+BASE_API_URL = 'http://127.0.0.1:5002'
 
-@pytest.fixture(scope='session', autouse=True)
-def environment():
-    os.environ['XRAY_API_BASE_URL'] = 'http://127.0.0.1:5002'
-    os.environ['XRAY_API_USER'] = 'jirauser'
-    os.environ['XRAY_API_PASSWORD'] = 'jirapassword'
-    os.environ['XRAY_CLIENT_ID'] = 'client_id'
-    os.environ['XRAY_CLIENT_SECRET'] = 'client_secret'
+
+def basic_auth() -> dict:
+    environ = {}
+    environ['XRAY_API_BASE_URL'] = BASE_API_URL
+    environ['XRAY_API_USER'] = 'jirauser'
+    environ['XRAY_API_PASSWORD'] = 'jirapassword'
+    return environ
+
+
+def client_secret_auth() -> dict:
+    environ = {}
+    environ['XRAY_API_BASE_URL'] = BASE_API_URL
+    environ['XRAY_CLIENT_ID'] = 'client_id'
+    environ['XRAY_CLIENT_SECRET'] = 'client_secret'
+    return environ
+
+
+def token_auth():
+    environ = {}
+    environ['XRAY_API_BASE_URL'] = BASE_API_URL
+    environ['XRAY_TOKEN'] = 'token'
+    return environ
+
+
+@pytest.fixture
+def auth():
+    def _auth(name):
+        if name == 'basic':
+            return basic_auth()
+        if name == 'client_secret':
+            return client_secret_auth()
+        if name == 'token':
+            return token_auth()
+
+    return _auth
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -24,7 +52,7 @@ def http_server():
     # cloud jira:
     server.add_json_response(
         '/api/v2/import/execution',
-        {'testExecIssue': {'key': 'JIRA-1000'}},
+        {'key': 'JIRA-1000'},
         methods=('POST',)
     )
     server.add_callback_response(

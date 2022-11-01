@@ -1,8 +1,7 @@
 import datetime as dt
-from unittest.mock import (
-    MagicMock,
-    patch,
-)
+import os
+from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 from behave.model_core import Status
@@ -11,6 +10,7 @@ from behave_xray.formatter import (
     ScenarioOutline,
     XrayCloudFormatter,
     XrayFormatter,
+    _get_jira_config
 )
 from behave_xray.helper import (
     get_overall_status,
@@ -19,6 +19,20 @@ from behave_xray.helper import (
     get_testcase_key_from_tag,
 )
 from behave_xray.model import DEFAULT_SUMMARY
+
+
+@pytest.fixture
+def environ_patched():
+    with mock.patch.dict(
+            os.environ,
+            {
+                'XRAY_API_BASE_URL': 'http://localhost',
+                'XRAY_API_USER': 'username',
+                'XRAY_API_PASSWORD': 'password'
+            },
+            clear=True
+    ):
+        yield
 
 
 @pytest.mark.parametrize(
@@ -37,7 +51,7 @@ def test_test_plan_tag_parser(tag, jira_id):
      ('jira.testcase("JIRA-10")', 'JIRA-10'),
      ('jira.testcaseJIRA-10', 'JIRA-10'),  # outline scenario
      ("allure.testcase('JIRA-10')", 'JIRA-10'),
-     ('@TEST_JIRA-10', 'JIRA-10')]  # exported from Xray Cucumber tests
+     ('TEST_JIRA-10', 'JIRA-10')]  # exported from Xray Cucumber tests
 )
 def test_test_case_tag_parser(tag, jira_id):
     assert get_testcase_key_from_tag(tag) == jira_id
@@ -72,12 +86,12 @@ def test_overall_status(statuses, expected_status):
     assert get_overall_status(statuses) == expected_status, f'Failed for {statuses}'
 
 
-def test_xray_formatter_return_correct_dictionary():
+def test_xray_formatter_return_correct_dictionary(environ_patched):
     mock_stream = MagicMock()
     mock_config = MagicMock()
     mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
-    with patch('datetime.datetime') as dt_mock:
+    with mock.patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
         formatter = XrayFormatter(mock_stream, mock_config)
 
@@ -112,12 +126,12 @@ def test_xray_formatter_return_correct_dictionary():
         assert formatter.test_execution.as_dict() == expected_output
 
 
-def test_xray_formatter_returns_correct_dictionary():
+def test_xray_formatter_returns_correct_dictionary(environ_patched):
     mock_stream = MagicMock()
     mock_config = MagicMock()
     mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
-    with patch('datetime.datetime') as dt_mock:
+    with mock.patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
         formatter = XrayFormatter(mock_stream, mock_config)
 
@@ -152,12 +166,12 @@ def test_xray_formatter_returns_correct_dictionary():
         assert formatter.test_execution.as_dict() == expected_output
 
 
-def test_xray_formatter_returns_correct_dictionary_for_outline_scenario():
+def test_xray_formatter_returns_correct_dictionary_for_outline_scenario(environ_patched):
     mock_stream = MagicMock()
     mock_config = MagicMock()
     mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
-    with patch('datetime.datetime') as dt_mock:
+    with mock.patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
         formatter = XrayFormatter(mock_stream, mock_config)
 
@@ -199,12 +213,12 @@ def test_xray_formatter_returns_correct_dictionary_for_outline_scenario():
         assert formatter.test_execution.as_dict() == expected_output
 
 
-def test_xray_cloud_formatter_return_correct_dictionary():
+def test_xray_cloud_formatter_return_correct_dictionary(environ_patched):
     mock_stream = MagicMock()
     mock_config = MagicMock()
     mock_config.userdata = {'xray.formatter': ''}
     testdt = dt.datetime(2021, 4, 23, 16, 30, 2, 0, tzinfo=dt.timezone.utc)
-    with patch('datetime.datetime') as dt_mock:
+    with mock.patch('datetime.datetime') as dt_mock:
         dt_mock.now.return_value = testdt
         formatter = XrayCloudFormatter(mock_stream, mock_config)
 
@@ -244,3 +258,66 @@ def test_xray_cloud_formatter_return_correct_dictionary():
         }
 
         assert formatter.test_execution.as_dict() == expected_output
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        'XRAY_API_BASE_URL': 'http://localhost',
+        'XRAY_API_USER': 'username',
+        'XRAY_API_PASSWORD': 'password'
+    },
+    clear=True
+)
+def test_get_jira_config_returns_basic_auth():
+    config = _get_jira_config()
+    assert config.auth_method == 'basic'
+    assert config.user_name == 'username'
+    assert config.user_password == 'password'
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        'XRAY_API_BASE_URL': 'http://localhost',
+        'XRAY_TOKEN': 'token'
+    },
+    clear=True
+)
+def test_get_jira_config_returns_token_auth():
+    config = _get_jira_config()
+    assert config.auth_method == 'token'
+    assert config.token == 'token'
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        'XRAY_API_BASE_URL': 'http://localhost',
+        'XRAY_CLIENT_ID': 'client_id',
+        'XRAY_CLIENT_SECRET': 'secret'
+    },
+    clear=True
+)
+def test_get_jira_config_returns_bearer_auth():
+    config = _get_jira_config()
+    assert config.auth_method == 'bearer'
+    assert config.client_id == 'client_id'
+    assert config.client_secret == 'secret'
+
+
+@mock.patch.dict(
+    os.environ,
+    {
+        'XRAY_API_BASE_URL': 'http://localhost',
+        'XRAY_API_USER': 'username',
+        'XRAY_API_PASSWORD': 'password',
+        'XRAY_CLIENT_ID': 'client_id',
+        'XRAY_CLIENT_SECRET': 'secret',
+        'XRAY_TOKEN': 'token'
+    },
+    clear=True
+)
+def test_get_jira_config_returns_bearer_auth_before_others():
+    config = _get_jira_config()
+    assert config.auth_method == 'bearer'

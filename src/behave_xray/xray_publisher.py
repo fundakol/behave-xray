@@ -1,5 +1,5 @@
 import logging
-from typing import Union
+from typing import Union, Tuple
 
 import requests
 from requests.auth import AuthBase
@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 
 class XrayPublisher:
 
-    def __init__(self, base_url: str, endpoint: str, auth: Union[AuthBase, tuple]) -> None:
+    def __init__(self, base_url: str, endpoint: str, auth: Union[AuthBase, Tuple[str, str]]) -> None:
         if base_url.endswith('/'):
             base_url = base_url[:-1]
         self.base_url = base_url
@@ -25,7 +25,7 @@ class XrayPublisher:
     def endpoint_url(self) -> str:
         return self.base_url + self.endpoint
 
-    def publish_xray_results(self, url: str, auth: AuthBase, data: dict) -> dict:
+    def publish_xray_results(self, url: str, auth: Union[AuthBase, Tuple[str, str]], data: dict) -> dict:
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -59,6 +59,10 @@ class XrayPublisher:
             _logger.error(e.message)
             return False
         else:
-            key = result['testExecIssue']['key']
+            _logger.debug('Publish returned: %s', result)
+            # XRAY Server+DC returns test execution information nested under 'testExecIssue'
+            # XRAY Cloud returns it directly
+            # Refer to XRAY API documentation for more details.
+            key = result['testExecIssue']['key'] if 'testExecIssue' in result else result['key']
             print('Uploaded results to JIRA XRAY Test Execution:', key)
             return True

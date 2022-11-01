@@ -28,9 +28,8 @@ def get_testcase_key_from_tag(tag: str) -> Optional[str]:
     match = re.match(r'^(allure|jira)\.testcase(.+)$', tag, flags=re.IGNORECASE)
     if match:
         return match.group(2)
-
     # feature files exported from Jira Xray Cucumber tests
-    match = re.match(r'@TEST_(.+)$', tag, flags=re.IGNORECASE)
+    match = re.match(r'^TEST_(.+)$', tag, flags=re.IGNORECASE)
     if match:
         return match.group(1)
     else:
