@@ -44,6 +44,29 @@ Feature: showing off behave
       | 6 | 10 | 18     |
 ```
 
+This library also supports the feature files [exported from Xray Cucumber tests](https://docs.getxray.app/pages/viewpage.action?pageId=62267221):
+```gherkin
+Feature: showing off behave
+    Feature's description
+
+  @TEST_JIRA-1
+  Scenario: run a simple test
+     Given we have behave installed
+      When we implement a test
+      Then behave will test it for us!
+
+  @TEST_JIRA-2
+  Scenario Outline: Add two numbers in Calc
+    Given Calculator is open
+    When I add <a> and <b>
+    Then result is <result>
+
+  Examples: Sum
+      | a | b  | result |
+      | 3 | 4  | 7      |
+      | 6 | 10 | 18     |
+```
+
 ### Configure Jira URL and authentication
 
 Set Jira server API base URL in system environments:
