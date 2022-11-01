@@ -5,38 +5,31 @@ from tests.mock_server import MockServer
 BASE_API_URL = 'http://127.0.0.1:5002'
 
 
-def basic_auth() -> dict:
-    environ = {}
-    environ['XRAY_API_BASE_URL'] = BASE_API_URL
-    environ['XRAY_API_USER'] = 'jirauser'
-    environ['XRAY_API_PASSWORD'] = 'jirapassword'
-    return environ
-
-
-def client_secret_auth() -> dict:
-    environ = {}
-    environ['XRAY_API_BASE_URL'] = BASE_API_URL
-    environ['XRAY_CLIENT_ID'] = 'client_id'
-    environ['XRAY_CLIENT_SECRET'] = 'client_secret'
-    return environ
-
-
-def token_auth():
-    environ = {}
-    environ['XRAY_API_BASE_URL'] = BASE_API_URL
-    environ['XRAY_TOKEN'] = 'token'
-    return environ
+basic_auth: dict = {
+    'XRAY_API_BASE_URL': BASE_API_URL,
+    'XRAY_API_USER': 'jirauser',
+    'XRAY_API_PASSWORD': 'jirapassword'
+}
+client_secret_auth: dict = {
+    'XRAY_API_BASE_URL': BASE_API_URL,
+    'XRAY_CLIENT_ID': 'client_id',
+    'XRAY_CLIENT_SECRET': 'client_secret'
+}
+token_auth: dict = {
+    'XRAY_API_BASE_URL': BASE_API_URL,
+    'XRAY_TOKEN': 'token'
+}
 
 
 @pytest.fixture
 def auth():
     def _auth(name):
         if name == 'basic':
-            return basic_auth()
+            return basic_auth
         if name == 'client_secret':
-            return client_secret_auth()
+            return client_secret_auth
         if name == 'token':
-            return token_auth()
+            return token_auth
 
     return _auth
 

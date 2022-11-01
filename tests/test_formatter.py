@@ -23,15 +23,13 @@ from behave_xray.model import DEFAULT_SUMMARY
 
 @pytest.fixture
 def environ_patched():
-    with mock.patch.dict(
-            os.environ,
-            {
-                'XRAY_API_BASE_URL': 'http://localhost',
-                'XRAY_API_USER': 'username',
-                'XRAY_API_PASSWORD': 'password'
-            },
-            clear=True
-    ):
+    """Mock enironment variable for basic authentication"""
+    os_environ_dict = {
+        'XRAY_API_BASE_URL': 'http://localhost',
+        'XRAY_API_USER': 'username',
+        'XRAY_API_PASSWORD': 'password'
+    }
+    with mock.patch.dict(os.environ, os_environ_dict, clear=True):
         yield
 
 
