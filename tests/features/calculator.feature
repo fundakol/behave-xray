@@ -15,6 +15,10 @@ Feature: Calculator
 
   @wip
   @jira.testcase('JIRA-33')
-  Scenario: Add tow numbers
+  Scenario: Add two numbers
     When I add 5 and 5
     Then result is 10
+
+  Scenario: Add two numbers without jira id
+    When I add 5 and 7
+    Then result is 12
