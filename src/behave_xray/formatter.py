@@ -93,6 +93,8 @@ class _XrayFormatterBase(Formatter):
 
     def feature(self, feature):
         self.current_feature = feature
+        if not feature.tags:
+            return
 
         self.test_execution.description = '\n'.join(feature.description)
         for tag in feature.tags:
