@@ -93,10 +93,10 @@ class _XrayFormatterBase(Formatter):
 
     def feature(self, feature):
         self.current_feature = feature
-        if not feature.tags:
-            return
 
-        self.test_execution.description = '\n'.join(feature.description)
+        # description is a mandatory Xray field, use feature name if it doesn't have a description
+        description_text = '\n'.join(feature.description) if feature.description else feature.name
+        self.test_execution.description = description_text
         for tag in feature.tags:
             test_exec_key = get_test_execution_key_from_tag(tag)
             if test_exec_key:
