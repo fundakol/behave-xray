@@ -1,11 +1,5 @@
 import datetime as dt
-from typing import (
-    Any,
-    Dict,
-    List,
-    Optional,
-    Union,
-)
+from typing import Any, Dict, List, Optional, Union
 
 
 DATETIME_FORMAT: str = '%Y-%m-%dT%H:%M:%S%z'

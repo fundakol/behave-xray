@@ -1,10 +1,11 @@
 import logging
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 import requests
 from requests.auth import AuthBase
 
 from behave_xray.exceptions import XrayError
+
 
 TEST_EXECUTION_ENDPOINT = '/rest/raven/2.0/import/execution'
 TEST_EXECUTION_ENDPOINT_CLOUD = '/api/v2/import/execution'

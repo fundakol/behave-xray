@@ -10,7 +10,7 @@ from behave_xray.formatter import (
     ScenarioOutline,
     XrayCloudFormatter,
     XrayFormatter,
-    _get_jira_config
+    _get_jira_config,
 )
 from behave_xray.helper import (
     get_overall_status,

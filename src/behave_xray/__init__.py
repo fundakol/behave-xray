@@ -1,1 +1,1 @@
-from .formatter import XrayFormatter, XrayCloudFormatter  # noqa: F401
+from .formatter import XrayCloudFormatter, XrayFormatter  # noqa: F401

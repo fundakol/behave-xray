@@ -9,16 +9,16 @@ from behave.model import Status
 from behave_xray.authentication import BearerAuth, PersonalAccessTokenAuth
 from behave_xray.exceptions import XrayError
 from behave_xray.helper import (
+    get_overall_status,
     get_test_execution_key_from_tag,
     get_test_plan_key_from_tag,
     get_testcase_key_from_tag,
-    get_overall_status
 )
-from behave_xray.model import TestExecution, TestCase, TestCaseCloud
+from behave_xray.model import TestCase, TestCaseCloud, TestExecution
 from behave_xray.xray_publisher import (
-    XrayPublisher,
     TEST_EXECUTION_ENDPOINT,
-    TEST_EXECUTION_ENDPOINT_CLOUD
+    TEST_EXECUTION_ENDPOINT_CLOUD,
+    XrayPublisher,
 )
 
 
