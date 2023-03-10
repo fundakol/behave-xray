@@ -1,12 +1,13 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from os import environ, getenv
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from behave.formatter.base import Formatter
 from behave.model import Status
 
-from behave_xray.authentication import BearerAuth, PersonalAccessTokenAuth
+from behave_xray.authentication import AuthBase, BearerAuth, PersonalAccessTokenAuth
 from behave_xray.exceptions import XrayError
 from behave_xray.helper import (
     get_overall_status,
@@ -20,6 +21,31 @@ from behave_xray.xray_publisher import (
     TEST_EXECUTION_ENDPOINT_CLOUD,
     XrayPublisher,
 )
+
+
+class AuthType(Enum):
+    bearer = auto()  # client id & client secret
+    token = auto()
+    basic = auto()
+
+
+@dataclass
+class JiraConfig:
+    jira_url: str
+    user_name: str = ''
+    user_password: str = ''
+    client_id: str = ''
+    client_secret: str = ''
+    token: str = ''
+
+    @property
+    def auth_method(self) -> AuthType:
+        if self.client_id and self.client_id:
+            return AuthType.bearer
+        if self.token:
+            return AuthType.token
+        else:
+            return AuthType.basic
 
 
 @dataclass
@@ -59,18 +85,17 @@ class _XrayFormatterBase(Formatter):
         self.testcases: dict = defaultdict(lambda: ScenarioOutline())
 
     @staticmethod
-    def _get_auth(jira_config):
-        if jira_config.auth_method == 'bearer':
-            auth = BearerAuth(
+    def _get_auth(jira_config: JiraConfig) -> Tuple[str, str] | AuthBase:
+        if jira_config.auth_method == AuthType.bearer:
+            return BearerAuth(
                 base_url=jira_config.jira_url,
                 client_id=jira_config.client_id,
                 client_secret=jira_config.client_secret
             )
-        elif jira_config.auth_method == 'token':
-            auth = PersonalAccessTokenAuth(token=jira_config.token)
-        else:
-            auth = (jira_config.user_name, jira_config.user_password)
-        return auth
+        elif jira_config.auth_method == AuthType.token:
+            return PersonalAccessTokenAuth(token=jira_config.token)
+        else:  # basic
+            return (jira_config.user_name, jira_config.user_password)
 
     def _get_summary(self) -> str:
         return self.config.userdata.get('xray.summary', '')
@@ -215,25 +240,6 @@ class XrayCloudFormatter(_XrayFormatterBase):
     @staticmethod
     def _get_test_case(test_key):
         return TestCaseCloud(test_key=test_key)
-
-
-@dataclass
-class JiraConfig:
-    jira_url: str
-    user_name: str = ''
-    user_password: str = ''
-    client_id: str = ''
-    client_secret: str = ''
-    token: str = ''
-
-    @property
-    def auth_method(self) -> str:
-        if self.client_id and self.client_id:
-            return 'bearer'  # client id & client secret
-        if self.token:
-            return 'token'
-        else:
-            return 'basic'
 
 
 def _get_jira_config() -> JiraConfig:

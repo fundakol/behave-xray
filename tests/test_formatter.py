@@ -7,6 +7,7 @@ import pytest
 from behave.model_core import Status
 
 from behave_xray.formatter import (
+    AuthType,
     ScenarioOutline,
     XrayCloudFormatter,
     XrayFormatter,
@@ -269,7 +270,7 @@ def test_xray_cloud_formatter_return_correct_dictionary(environ_patched):
 )
 def test_get_jira_config_returns_basic_auth():
     config = _get_jira_config()
-    assert config.auth_method == 'basic'
+    assert config.auth_method == AuthType.basic
     assert config.user_name == 'username'
     assert config.user_password == 'password'
 
@@ -284,7 +285,7 @@ def test_get_jira_config_returns_basic_auth():
 )
 def test_get_jira_config_returns_token_auth():
     config = _get_jira_config()
-    assert config.auth_method == 'token'
+    assert config.auth_method == AuthType.token
     assert config.token == 'token'
 
 
@@ -299,7 +300,7 @@ def test_get_jira_config_returns_token_auth():
 )
 def test_get_jira_config_returns_bearer_auth():
     config = _get_jira_config()
-    assert config.auth_method == 'bearer'
+    assert config.auth_method == AuthType.bearer
     assert config.client_id == 'client_id'
     assert config.client_secret == 'secret'
 
@@ -318,4 +319,4 @@ def test_get_jira_config_returns_bearer_auth():
 )
 def test_get_jira_config_returns_bearer_auth_before_others():
     config = _get_jira_config()
-    assert config.auth_method == 'bearer'
+    assert config.auth_method == AuthType.bearer
