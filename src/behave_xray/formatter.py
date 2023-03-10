@@ -2,7 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from os import environ, getenv
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from behave.formatter.base import Formatter
 from behave.model import Status
@@ -85,7 +85,7 @@ class _XrayFormatterBase(Formatter):
         self.testcases: dict = defaultdict(lambda: ScenarioOutline())
 
     @staticmethod
-    def _get_auth(jira_config: JiraConfig) -> Tuple[str, str] | AuthBase:
+    def _get_auth(jira_config: JiraConfig) -> Union[Tuple[str, str], AuthBase]:
         if jira_config.auth_method == AuthType.bearer:
             return BearerAuth(
                 base_url=jira_config.jira_url,
