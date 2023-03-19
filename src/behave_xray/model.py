@@ -80,17 +80,18 @@ class TestCaseCloud(TestCase):
 
 
 class TestExecution:
+    """Class stores information about test execution and tests."""
 
     def __init__(
-            self,
-            test_execution_key: str = '',
-            test_plan_key: str = '',
-            user: str = '',
-            revision: str = '',
-            version: str = '',
-            summary: str = '',
-            description: str = '',
-            tests: Optional[List[TestCase]] = None
+        self,
+        test_execution_key: str = '',
+        test_plan_key: str = '',
+        user: str = '',
+        revision: str = '',
+        version: str = '',
+        summary: str = '',
+        description: str = '',
+        tests: Optional[List[TestCase]] = None
     ):
         """
         :param test_execution_key: Test execution Xray ID

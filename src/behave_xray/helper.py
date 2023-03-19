@@ -5,6 +5,7 @@ from behave.model import Status
 
 
 def get_test_execution_key_from_tag(tag: str) -> Optional[str]:
+    """Return Jira Xray test execution ID or None if not defined."""
     match = re.match(r"^jira\.test_execution\('(.+)'\)$", tag, flags=re.IGNORECASE)
     if match:
         return match.group(1)
@@ -13,6 +14,7 @@ def get_test_execution_key_from_tag(tag: str) -> Optional[str]:
 
 
 def get_test_plan_key_from_tag(tag: str) -> Optional[str]:
+    """Return Jira Xray test plan ID or None if not defined."""
     match = re.match(r"^jira\.test_plan\('(.+)'\)$", tag, flags=re.IGNORECASE)
     if match:
         return match.group(1)
@@ -21,6 +23,7 @@ def get_test_plan_key_from_tag(tag: str) -> Optional[str]:
 
 
 def get_testcase_key_from_tag(tag: str) -> Optional[str]:
+    """Return Jira Xray test ID or None if not defined."""
     match = re.match(r"^(allure|jira)\.testcase\(['\"](.+)['\"]\)$", tag, flags=re.IGNORECASE)
     if match:
         return match.group(2)
