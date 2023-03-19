@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, AnyStr, Dict, List, Optional, Union
 
 
 DATETIME_FORMAT: str = '%Y-%m-%dT%H:%M:%S%z'
@@ -8,6 +8,7 @@ DEFAULT_SUMMARY: str = 'Execution of automated tests'
 
 class TestCase:
     """Class represents Test Case."""
+
     VALID_STATUSES = (
         'TODO',
         'ABORTED',
@@ -19,12 +20,12 @@ class TestCase:
     )
 
     def __init__(
-            self,
-            test_key: str = '',
-            status: str = 'TODO',
-            comment: str = '',
-            examples: Optional[List[str]] = None,
-            duration: float = 0.0,
+        self,
+        test_key: str = '',
+        status: str = 'TODO',
+        comment: str = '',
+        examples: Optional[List[str]] = None,
+        duration: float = 0.0,
     ):
         """
         :param test_key: Test Case ID
@@ -38,6 +39,7 @@ class TestCase:
         self.comment = comment
         self.examples = examples or []
         self.duration = duration
+        self.evidences: List[Dict[str, AnyStr]] = []
 
     def __repr__(self):
         return f"{self.__class__.__name__}(test_key='{self.test_key}', status='{self.status}')"
@@ -55,14 +57,17 @@ class TestCase:
         if status not in self.VALID_STATUSES:
             raise ValueError(f'Status must be one of {", ".join(self.VALID_STATUSES)}, but was {status}')
 
-    def as_dict(self) -> Dict[str, str]:
+    def as_dict(self) -> Dict[str, Any]:
         """Serialize Test Case."""
-        return dict(
+        data: Dict[str, Any] = dict(
             testKey=self.test_key,
             status=self.status,
             comment=self.comment,
             examples=self.examples
         )
+        if self.evidences:
+            data['evidences'] = self.evidences
+        return data
 
 
 class TestCaseCloud(TestCase):
