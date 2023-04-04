@@ -8,7 +8,7 @@ from behave.model_core import Status
 
 from behave_xray.formatter import (
     AuthType,
-    ScenarioOutline,
+    ScenarioResult,
     XrayCloudFormatter,
     XrayFormatter,
     _get_jira_config,
@@ -95,8 +95,8 @@ def test_xray_formatter_return_correct_dictionary(environ_patched):
         formatter = XrayFormatter(mock_stream, mock_config)
 
         formatter.testcases = {
-            'JIRA-1': ScenarioOutline('JIRA-1', statuses=[Status.passed]),
-            'JIRA-2': ScenarioOutline('JIRA-2', statuses=[Status.passed])
+            'JIRA-1': ScenarioResult('JIRA-1', statuses=[Status.passed]),
+            'JIRA-2': ScenarioResult('JIRA-2', statuses=[Status.passed])
         }
         formatter.collect_tests()
         expected_output = {
@@ -135,8 +135,8 @@ def test_xray_formatter_returns_correct_dictionary(environ_patched):
         formatter = XrayFormatter(mock_stream, mock_config)
 
         formatter.testcases = {
-            'JIRA-1': ScenarioOutline('JIRA-1', statuses=[Status.passed]),
-            'JIRA-2': ScenarioOutline('JIRA-2', statuses=[Status.passed])
+            'JIRA-1': ScenarioResult('JIRA-1', statuses=[Status.passed]),
+            'JIRA-2': ScenarioResult('JIRA-2', statuses=[Status.passed])
         }
         formatter.collect_tests()
         expected_output = {
@@ -175,12 +175,12 @@ def test_xray_formatter_returns_correct_dictionary_for_outline_scenario(environ_
         formatter = XrayFormatter(mock_stream, mock_config)
 
         formatter.testcases = {
-            'JIRA-1': ScenarioOutline(
+            'JIRA-1': ScenarioResult(
                 'JIRA-1',
                 statuses=[Status.passed, Status.passed],
                 is_outline=True
             ),
-            'JIRA-2': ScenarioOutline(
+            'JIRA-2': ScenarioResult(
                 'JIRA-2',
                 statuses=[Status.passed, Status.failed],
                 is_outline=True)
@@ -222,12 +222,12 @@ def test_xray_cloud_formatter_return_correct_dictionary(environ_patched):
         formatter = XrayCloudFormatter(mock_stream, mock_config)
 
         formatter.testcases = {
-            'JIRA-1': ScenarioOutline(
+            'JIRA-1': ScenarioResult(
                 'JIRA-1',
                 statuses=[Status.passed, Status.passed],
                 is_outline=True
             ),
-            'JIRA-2': ScenarioOutline(
+            'JIRA-2': ScenarioResult(
                 'JIRA-2',
                 statuses=[Status.passed, Status.failed],
                 is_outline=True)
