@@ -116,6 +116,22 @@ and use with shorter name:
 $ behave --f xray
 ```
 
+### Attach an evidence to the scenario
+
+One can implement `scenario_xray_result` hook to update results for a scenario.
+
+```python
+# - FILE: environment.py
+from behave.model import Status
+from behave_xray import hookimpl
+from behave_xray.evidence import text
+
+@hookimpl
+def scenario_xray_result(result, scenario):
+    if scenario.status == Status.failed:
+        result.evidences.append(text(data='This is scenario evidence', filename=f'{scenario.name}.txt'))
+```
+
 ### Customize report
 
 Add summary to a report:
