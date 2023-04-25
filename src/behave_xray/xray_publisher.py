@@ -14,6 +14,7 @@ _logger = logging.getLogger(__name__)
 
 
 class XrayPublisher:
+    """Sends Xray report to the Jira server."""
 
     def __init__(self, base_url: str, endpoint: str, auth: Union[AuthBase, Tuple[str, str]]) -> None:
         if base_url.endswith('/'):

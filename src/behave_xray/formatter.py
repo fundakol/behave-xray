@@ -1,12 +1,18 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, auto
+import importlib
 from os import environ, getenv
-from typing import Dict, List, Optional, Tuple, Union
+from typing import AnyStr, Dict, List, Optional, Tuple, Union
 
+import pluggy
 from behave.formatter.base import Formatter
+from behave.model import Feature as BehaveFeature
+from behave.model import Scenario as BehaveScenario
+from behave.model import ScenarioOutline as BehaveScenarioOutline
 from behave.model import Status
 
+from behave_xray import hookspecs
 from behave_xray.authentication import AuthBase, BearerAuth, PersonalAccessTokenAuth
 from behave_xray.exceptions import XrayError
 from behave_xray.helper import (
@@ -49,13 +55,14 @@ class JiraConfig:
 
 
 @dataclass
-class ScenarioOutline:
-    """Class store Scenario Outline information."""
+class ScenarioResult:
+    """Class stores scenario result."""
 
     testcase_key: Optional[str] = None
     statuses: List[Status] = field(default_factory=list)
     comment: str = ''
     is_outline: bool = False
+    evidences: List[Dict[str, AnyStr]] = field(default_factory=list)
 
 
 @dataclass
@@ -72,17 +79,35 @@ class _XrayFormatterBase(Formatter):
 
     def __init__(self, stream, config, publisher: XrayPublisher):
         super().__init__(stream, config)
+        self.pm = self._get_plugin_manager()
+        self._register_user_hook()
         self.xray_publisher = publisher
-        self.current_feature = None
-        self.current_scenario = None
-        self.current_test_key = None
+        self.current_feature: Optional[BehaveFeature] = None
+        self.current_scenario: Optional[BehaveScenario] = None
+        self.current_test_key: Optional[str] = None
         self.test_execution: TestExecution = TestExecution(
             summary=self._get_summary(),
             user=self._get_user(),
             revision=self._get_revision(),
             version=self._get_version()
         )
-        self.testcases: dict = defaultdict(lambda: ScenarioOutline())
+        # store Jira Xray test ID with corresponding Behave's scenario
+        self.testcases: Dict[str, ScenarioResult] = defaultdict(lambda: ScenarioResult())
+
+    def _get_plugin_manager(self):
+        pm = pluggy.PluginManager('xray')
+        pm.add_hookspecs(hookspecs)
+        return pm
+
+    def _register_user_hook(self):
+        try:
+            module_name = str(self.config.environment_file).split('.')[0]
+        except KeyError:
+            return
+        try:
+            self.pm.register(importlib.import_module(module_name))
+        except ImportError:
+            pass
 
     @staticmethod
     def _get_auth(jira_config: JiraConfig) -> Union[Tuple[str, str], AuthBase]:
@@ -114,7 +139,7 @@ class _XrayFormatterBase(Formatter):
         self.current_scenario = None
         self.current_test_key = None
         self.test_execution = TestExecution()
-        self.testcases = defaultdict(lambda: ScenarioOutline())
+        self.testcases = defaultdict(lambda: ScenarioResult())
 
     def feature(self, feature):
         self.current_feature = feature
@@ -131,10 +156,11 @@ class _XrayFormatterBase(Formatter):
                 self.test_execution.test_plan_key = test_plan_key
 
     def is_scenario_outline(self):
-        return True if 'Scenario Outline' in self.current_scenario.keyword else False
+        return isinstance(self.current_scenario, BehaveScenarioOutline)
 
     def scenario(self, scenario):
         self.current_scenario = scenario
+        self.current_test_key = None
         if not scenario.tags:
             return
 
@@ -160,6 +186,13 @@ class _XrayFormatterBase(Formatter):
             verdict.message = self.current_scenario.skip_reason
         return verdict
 
+    @property
+    def current_test_case(self) -> ScenarioResult:
+        try:
+            return self.testcases[self.current_test_key]
+        except KeyError:
+            return None
+
     def result(self, step):
         if self.current_scenario.status == Status.untested:
             return
@@ -168,15 +201,20 @@ class _XrayFormatterBase(Formatter):
             return
 
         verdict = self.get_verdict(step)
-        self.testcases[self.current_test_key].statuses.append(verdict.status)
+        self.current_test_case.statuses.append(verdict.status)
+        self.pm.hook.scenario_xray_result(
+            result=self.current_test_case,
+            scenario=self.current_scenario
+        )
         if not self.is_scenario_outline():
-            self.testcases[self.current_test_key].comment = verdict.message
+            self.current_test_case.comment = verdict.message
 
     @staticmethod
     def _get_test_case(test_key) -> TestCase:
         return TestCase(test_key=test_key)
 
     def eof(self) -> None:
+        # run when current feature is done
         if self.config.dry_run:
             return
 
@@ -187,6 +225,7 @@ class _XrayFormatterBase(Formatter):
         self.reset()
 
     def collect_tests(self) -> None:
+        """Update test execution with test cases."""
         for tc_id, tc_status in self.testcases.items():
             testcase = self._get_test_case(test_key=tc_id)
             if tc_status.is_outline:
@@ -195,6 +234,7 @@ class _XrayFormatterBase(Formatter):
             else:
                 testcase.status = self._get_xray_status(tc_status.statuses[0].name)
                 testcase.comment = tc_status.comment
+            testcase.evidences = tc_status.evidences
             self.test_execution.append(testcase)
 
 
@@ -243,6 +283,7 @@ class XrayCloudFormatter(_XrayFormatterBase):
 
 
 def _get_jira_config() -> JiraConfig:
+    """Return jira configuration from env variables."""
     try:
         jira_url = environ['XRAY_API_BASE_URL']
     except KeyError:
