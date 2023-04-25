@@ -39,3 +39,23 @@ def png(data: AnyStr, filename: str) -> Dict[str, str]:
 
 def text(data: AnyStr, filename: str) -> Dict[str, str]:
     return evidence(data, filename, PLAIN_TEXT)
+
+
+def csv(data: AnyStr, filename: str) -> Dict[str, str]:
+    return evidence(data, filename, CSV)
+
+
+def json(data: AnyStr, filename: str) -> Dict[str, str]:
+    return evidence(data, filename, JSON)
+
+
+def xml(data: AnyStr, filename: str) -> Dict[str, str]:
+    return evidence(data, filename, XML)
+
+
+def zip(data: AnyStr, filename: str) -> Dict[str, str]:
+    return evidence(data, filename, ZIP)
+
+
+def gzip(data: AnyStr, filename: str) -> Dict[str, str]:
+    return evidence(data, filename, GZIP)
