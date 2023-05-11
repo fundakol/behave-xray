@@ -22,3 +22,13 @@ Feature: Calculator
   Scenario: Add two numbers without jira id
     When I add 5 and 7
     Then result is 12
+
+  @jira.testcase('JIRA-34')
+  Scenario Outline: Add two numbers outline
+    When I add <first> and <second>
+    Then result is <result>
+
+    Examples:
+      | first | second | result |
+      | 1     | 2      | 3      |
+      | 2     | 5      | 8      |
