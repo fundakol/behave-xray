@@ -15,7 +15,7 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        name: [ "3.7", "3.8", "3.9", "3.10" ]
+        name: [ "3.7", "3.8", "3.9", "3.10", "3.11" ]
         include:
         - name: "3.7"
           python: "3.7"
@@ -30,6 +30,9 @@ jobs:
           python: "3.10"
           tox_env: "py310"
           use_coverage: true
+        - name: "3.11"
+          python: "3.11"
+          tox_env: "py311"
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python ${{ matrix.python }}

@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 
@@ -24,4 +25,52 @@ def test_if_xray_formatter_publishes_results(formatter, auth_type, auth):
     )
     assert not process.stderr
     assert 'Uploaded results to JIRA XRAY Test Execution: JIRA-1000' in process.stdout, process.stdout
-    assert '3 scenarios passed, 1 failed, 0 skipped' in process.stdout, process.stdout
+    assert '4 scenarios passed, 2 failed, 0 skipped' in process.stdout, process.stdout
+
+
+def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
+    report_path = tmp_path / 'xray.json'
+    env = dict(os.environ).copy()
+    env.update(auth('basic'))
+
+    process = subprocess.run(
+        ['python', '-m', 'behave', 'tests', '-f', 'behave_xray:XrayFormatter', '-o', report_path.name],
+        capture_output=True,
+        text=True,
+        env=env
+    )
+    print(process.stdout)
+    assert not process.stderr
+    assert 'Uploaded results to JIRA XRAY Test Execution: JIRA-1000' in process.stdout
+    assert '4 scenarios passed, 2 failed, 0 skipped' in process.stdout
+
+    with open(report_path.name, 'r') as f:
+        report = json.load(f)
+
+    assert 'tests' in report
+    assert report['tests'] == [
+            {
+                'testKey': 'JIRA-31',
+                'status': 'PASS',
+                'comment': '',
+                'examples': []
+            },
+            {
+                'testKey': 'JIRA-32',
+                'status': 'FAIL',
+                'comment': 'Assertion Failed: Not equal',
+                'examples': []
+            },
+            {
+                'testKey': 'JIRA-33',
+                'status': 'PASS',
+                'comment': '',
+                'examples': []
+            },
+            {
+                'testKey': 'JIRA-34',
+                'status': 'FAIL',
+                'comment': '',  # FIXME: missing assertion message
+                'examples': ['PASS', 'FAIL']
+            }
+        ]
