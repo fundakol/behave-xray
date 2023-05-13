@@ -1,7 +1,9 @@
+import importlib
+import json
+import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, auto
-import importlib
 from os import environ, getenv
 from typing import AnyStr, Dict, List, Optional, Tuple, Union
 
@@ -9,7 +11,6 @@ import pluggy
 from behave.formatter.base import Formatter
 from behave.model import Feature as BehaveFeature
 from behave.model import Scenario as BehaveScenario
-from behave.model import ScenarioOutline as BehaveScenarioOutline
 from behave.model import Status
 
 from behave_xray import hookspecs
@@ -79,6 +80,7 @@ class _XrayFormatterBase(Formatter):
 
     def __init__(self, stream, config, publisher: XrayPublisher):
         super().__init__(stream, config)
+        self.stream = self.open()
         self.pm = self._get_plugin_manager()
         self._register_user_hook()
         self.xray_publisher = publisher
@@ -120,7 +122,7 @@ class _XrayFormatterBase(Formatter):
         elif jira_config.auth_method == AuthType.token:
             return PersonalAccessTokenAuth(token=jira_config.token)
         else:  # basic
-            return (jira_config.user_name, jira_config.user_password)
+            return jira_config.user_name, jira_config.user_password
 
     def _get_summary(self) -> str:
         return self.config.userdata.get('xray.summary', '')
@@ -156,7 +158,7 @@ class _XrayFormatterBase(Formatter):
                 self.test_execution.test_plan_key = test_plan_key
 
     def is_scenario_outline(self):
-        return isinstance(self.current_scenario, BehaveScenarioOutline)
+        return True if 'Scenario Outline' in self.current_scenario.keyword else False
 
     def scenario(self, scenario):
         self.current_scenario = scenario
@@ -180,14 +182,14 @@ class _XrayFormatterBase(Formatter):
         verdict = Verdict(self.current_scenario.status, '')
         if step.status == Status.failed:
             verdict.message = step.error_message
-        if step.status == Status.untested:
+        elif step.status == Status.untested:
             verdict.message = 'Untested'
-        if step.status == Status.skipped:
+        elif step.status == Status.skipped:
             verdict.message = self.current_scenario.skip_reason
         return verdict
 
     @property
-    def current_test_case(self) -> ScenarioResult:
+    def current_test_case(self) -> Optional[ScenarioResult]:
         try:
             return self.testcases[self.current_test_key]
         except KeyError:
@@ -221,6 +223,9 @@ class _XrayFormatterBase(Formatter):
         self.collect_tests()
         if self.test_execution.tests:
             self.xray_publisher.publish(self.test_execution.as_dict())
+            if self.stream != sys.stdout:
+                self.stream.write(json.dumps(self.test_execution.as_dict(), indent=4))
+                self.stream.flush()
         self.test_execution.flush()
         self.reset()
 

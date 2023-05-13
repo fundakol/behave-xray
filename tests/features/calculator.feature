@@ -24,7 +24,7 @@ Feature: Calculator
     Then result is 12
 
   @jira.testcase('JIRA-34')
-  Scenario Outline: Add two numbers outline
+  Scenario Outline: Add two numbers: <first> and <second>
     When I add <first> and <second>
     Then result is <result>
 
