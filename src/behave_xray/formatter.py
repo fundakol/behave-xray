@@ -140,7 +140,12 @@ class _XrayFormatterBase(Formatter):
         self.current_feature = None
         self.current_scenario = None
         self.current_test_key = None
-        self.test_execution = TestExecution()
+        self.test_execution = TestExecution(
+            summary=self._get_summary(),
+            user=self._get_user(),
+            revision=self._get_revision(),
+            version=self._get_version()
+        )
         self.testcases = defaultdict(lambda: ScenarioResult())
 
     def feature(self, feature):
