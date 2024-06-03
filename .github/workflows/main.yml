@@ -15,11 +15,8 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        name: [ "3.7", "3.8", "3.9", "3.10", "3.11" ]
+        name: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
         include:
-        - name: "3.7"
-          python: "3.7"
-          tox_env: "py37"
         - name: "3.8"
           python: "3.8"
           tox_env: "py38"
@@ -33,10 +30,13 @@ jobs:
         - name: "3.11"
           python: "3.11"
           tox_env: "py311"
+        - name: "3.12"
+          python: "3.12"
+          tox_env: "py312"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Python ${{ matrix.python }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Install packages
@@ -52,7 +52,9 @@ jobs:
         run: python -m coverage xml
       - name: Upload coverage to Codecov
         if: "matrix.use_coverage"
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           fail_ci_if_error: true
           files: ./coverage.xml
@@ -62,12 +64,12 @@ jobs:
     runs-on: ubuntu-latest
     name: flake8
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
       - name: Install packages
         run: pip install tox
-      - name: Run tests
+      - name: Run linter
         run: tox -e flake8
