@@ -1,11 +1,10 @@
 import importlib
 import json
-import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from os import environ, getenv
-from typing import AnyStr, Dict, List, Optional, Tuple, Union
+from typing import Any, AnyStr, Dict, List, Optional, Tuple, Union
 
 import pluggy
 from behave.formatter.base import Formatter
@@ -95,6 +94,8 @@ class _XrayFormatterBase(Formatter):
         )
         # store Jira Xray test ID with corresponding Behave's scenario
         self.testcases: Dict[str, ScenarioResult] = defaultdict(lambda: ScenarioResult())
+        # stores results for same test plan and test execution
+        self._results: Dict[Tuple[str, str], Dict[str, Any]] = {}
 
     def _get_plugin_manager(self):
         pm = pluggy.PluginManager('xray')
@@ -227,10 +228,11 @@ class _XrayFormatterBase(Formatter):
 
         self.collect_tests()
         if self.test_execution.tests:
-            self.xray_publisher.publish(self.test_execution.as_dict())
-            if self.stream != sys.stdout:
-                self.stream.write(json.dumps(self.test_execution.as_dict(), indent=4))
-                self.stream.flush()
+            key = (self.test_execution.test_plan_key, self.test_execution.test_execution_key)
+            if key not in self._results:
+                self._results[key] = self.test_execution.as_dict()
+            else:
+                self._results[key]['tests'].extend(self.test_execution.as_dict()['tests'])
         self.test_execution.flush()
         self.reset()
 
@@ -246,6 +248,15 @@ class _XrayFormatterBase(Formatter):
                 testcase.comment = tc_status.comment
             testcase.evidences = tc_status.evidences
             self.test_execution.append(testcase)
+
+    def close(self):
+        all_results = []
+        for results in self._results.values():
+            self.xray_publisher.publish(results)
+            all_results.append(results)
+        self.stream.write(json.dumps(all_results, indent=4))
+        self.stream.flush()
+        self.close_stream()
 
 
 class XrayFormatter(_XrayFormatterBase):

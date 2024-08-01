@@ -25,7 +25,7 @@ def test_if_xray_formatter_publishes_results(formatter, auth_type, auth):
     )
     assert not process.stderr
     assert 'Uploaded results to JIRA XRAY Test Execution: JIRA-1000' in process.stdout, process.stdout
-    assert '4 scenarios passed, 2 failed, 0 skipped' in process.stdout, process.stdout
+    assert '5 scenarios passed, 3 failed, 0 skipped' in process.stdout, process.stdout
 
 
 def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
@@ -42,13 +42,14 @@ def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
     print(process.stdout)
     assert not process.stderr
     assert 'Uploaded results to JIRA XRAY Test Execution: JIRA-1000' in process.stdout
-    assert '4 scenarios passed, 2 failed, 0 skipped' in process.stdout
+    assert '5 scenarios passed, 3 failed, 0 skipped' in process.stdout
 
     with open(report_path.name, 'r') as f:
         report = json.load(f)
 
-    assert 'tests' in report
-    assert report['tests'] == [
+    assert len(report) == 1
+    assert 'tests' in report[0]
+    assert report[0]['tests'] == [
             {
                 'testKey': 'JIRA-31',
                 'status': 'PASS',
@@ -72,5 +73,17 @@ def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
                 'status': 'FAIL',
                 'comment': '',  # FIXME: missing assertion message
                 'examples': ['PASS', 'FAIL']
+            },
+            {
+                'testKey': 'JIRA-41',
+                'status': 'PASS',
+                'comment': '',
+                'examples': []
+            },
+            {
+                'testKey': 'JIRA-42',
+                'status': 'FAIL',
+                'comment': 'Assertion Failed: Not equal',
+                'examples': []
             }
         ]
