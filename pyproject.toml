@@ -4,7 +4,7 @@ description = "Behave JIRA XRAY results uploader"
 readme = "README.rst"
 requires-python = ">=3.7"
 authors = [{ name = "Lukasz Fundakowski", email = "fundakol@yahoo.com" }]
-keywords = ["behave, JIRA, XRAY"]
+keywords = ["JIRA", "XRAY", "behave"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: Apache Software License",
@@ -23,6 +23,15 @@ dynamic = ["version"]
 [project.urls]
 homepage = "https://github.com/fundakol/behave-xray"
 
+[dependency-groups]
+dev = [
+  "flake8>=5.0.4",
+  "flask>=2.2.5",
+  "mypy>=1.4.1",
+  "pytest>=7.4.4",
+  "pytest-cov>=4.1.0",
+]
+
 [build-system]
 requires = ["setuptools>=45", "setuptools_scm>=6.2"]
 build-backend = "setuptools.build_meta"
@@ -37,8 +46,3 @@ line-length = 120
 quote-style = "double"
 
 [tool.setuptools_scm]
-
-[dependency-groups]
-dev = [
-    "flake8>=5.0.4",
-]
