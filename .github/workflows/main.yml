@@ -15,24 +15,27 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        name: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+        name: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         include:
-        - name: "3.8"
-          python: "3.8"
-          tox_env: "py38"
-        - name: "3.9"
-          python: "3.9"
-          tox_env: "py39"
-        - name: "3.10"
-          python: "3.10"
-          tox_env: "py310"
-          use_coverage: true
-        - name: "3.11"
-          python: "3.11"
-          tox_env: "py311"
-        - name: "3.12"
-          python: "3.12"
-          tox_env: "py312"
+          - name: "3.9"
+            python: "3.9"
+            tox_env: "py39"
+          - name: "3.10"
+            python: "3.10"
+            tox_env: "py310"
+            use_coverage: true
+          - name: "3.11"
+            python: "3.11"
+            tox_env: "py311"
+          - name: "3.12"
+            python: "3.12"
+            tox_env: "py312"
+          - name: "3.13"
+            python: "3.13"
+            tox_env: "py313"
+          - name: "3.14"
+            python: "3.14"
+            tox_env: "py314"
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python ${{ matrix.python }}
@@ -52,13 +55,9 @@ jobs:
         run: python -m coverage xml
       - name: Upload coverage to Codecov
         if: "matrix.use_coverage"
-        uses: codecov/codecov-action@v4
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/test-results-action@v1
         with:
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
     runs-on: ubuntu-latest

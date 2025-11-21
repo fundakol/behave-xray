@@ -1,42 +1,39 @@
-[build-system]
-requires = [
-    "setuptools>=45",
-    "setuptools_scm>=6.2"
-]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools_scm]
-
 [project]
 name = "behave-xray"
-dynamic = ["version"]
-authors = [
-    { name = "Lukasz Fundakowski", email = "fundakol@yahoo.com" }
-]
 description = "Behave JIRA XRAY results uploader"
 readme = "README.rst"
 requires-python = ">=3.7"
+authors = [{ name = "Lukasz Fundakowski", email = "fundakol@yahoo.com" }]
 keywords = ["behave, JIRA, XRAY"]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
-dependencies = [
-    "behave",
-    "requests",
-    "pluggy"
-]
+dependencies = ["behave", "pluggy", "requests"]
+dynamic = ["version"]
 
 [project.urls]
 homepage = "https://github.com/fundakol/behave-xray"
 
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
 [tool.behave.formatters]
 xray-formatter = "behave_xray:XrayFormatter"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.setuptools_scm]
