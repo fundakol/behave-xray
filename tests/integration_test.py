@@ -34,7 +34,7 @@ def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
     env.update(auth('basic'))
 
     process = subprocess.run(
-        ['python', '-m', 'behave', 'tests', '-f', 'behave_xray:XrayFormatter', '-o', report_path.name],
+        ['python', '-m', 'behave', 'tests', '-f', 'behave_xray:XrayFormatter', '-o', report_path],
         capture_output=True,
         text=True,
         env=env
@@ -44,7 +44,7 @@ def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
     assert 'Uploaded results to JIRA XRAY Test Execution: JIRA-1000' in process.stdout
     assert '4 scenarios passed, 2 failed, 0 skipped' in process.stdout
 
-    with open(report_path.name) as f:
+    with open(report_path) as f:
         report = json.load(f)
 
     assert 'tests' in report
