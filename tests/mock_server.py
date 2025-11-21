@@ -4,7 +4,6 @@ from uuid import uuid4
 from flask import Flask, jsonify
 from werkzeug.serving import make_server
 
-
 HOST = '127.0.0.1'
 
 

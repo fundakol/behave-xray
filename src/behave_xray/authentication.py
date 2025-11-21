@@ -6,7 +6,6 @@ from requests.auth import AuthBase
 
 from behave_xray.exceptions import XrayError
 
-
 _logger = logging.getLogger(__name__)
 
 

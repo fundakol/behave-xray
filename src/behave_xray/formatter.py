@@ -1,3 +1,4 @@
+import contextlib
 import importlib
 import json
 import sys
@@ -106,10 +107,8 @@ class _XrayFormatterBase(Formatter):
             module_name = str(self.config.environment_file).split('.')[0]
         except KeyError:
             return
-        try:
+        with contextlib.suppress(ImportError):
             self.pm.register(importlib.import_module(module_name))
-        except ImportError:
-            pass
 
     @staticmethod
     def _get_auth(jira_config: JiraConfig) -> Union[Tuple[str, str], AuthBase]:
@@ -162,10 +161,10 @@ class _XrayFormatterBase(Formatter):
             if test_plan_key:
                 self.test_execution.test_plan_key = test_plan_key
 
-    def is_scenario_outline(self):
-        return True if 'Scenario Outline' in self.current_scenario.keyword else False
+    def is_scenario_outline(self) -> bool:
+        return 'Scenario Outline' in self.current_scenario.keyword
 
-    def scenario(self, scenario):
+    def scenario(self, scenario) -> None:
         self.current_scenario = scenario
         self.current_test_key = None
         if not scenario.tags:
@@ -200,7 +199,7 @@ class _XrayFormatterBase(Formatter):
         except KeyError:
             return None
 
-    def result(self, step):
+    def result(self, step) -> None:
         if self.current_scenario.status == Status.untested:
             return
 
@@ -217,7 +216,7 @@ class _XrayFormatterBase(Formatter):
             self.current_test_case.comment = verdict.message
 
     @staticmethod
-    def _get_test_case(test_key) -> TestCase:
+    def _get_test_case(test_key: str) -> TestCase:
         return TestCase(test_key=test_key)
 
     def eof(self) -> None:
@@ -250,6 +249,7 @@ class _XrayFormatterBase(Formatter):
 
 class XrayFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray."""
+
     endpoint: str = TEST_EXECUTION_ENDPOINT
 
     STATUS_MAPS: Dict[str, str] = {
@@ -270,6 +270,7 @@ class XrayFormatter(_XrayFormatterBase):
 
 class XrayCloudFormatter(_XrayFormatterBase):
     """Formatter publish test results to Jira Xray Cloud."""
+
     endpoint: str = TEST_EXECUTION_ENDPOINT_CLOUD
     name = 'xray-cloud'
     STATUS_MAPS = {
@@ -288,7 +289,7 @@ class XrayCloudFormatter(_XrayFormatterBase):
         super().__init__(stream, config, publisher)
 
     @staticmethod
-    def _get_test_case(test_key):
+    def _get_test_case(test_key: str) -> TestCaseCloud:
         return TestCaseCloud(test_key=test_key)
 
 
@@ -297,7 +298,7 @@ def _get_jira_config() -> JiraConfig:
     try:
         jira_url = environ['XRAY_API_BASE_URL']
     except KeyError:
-        raise XrayError('Environment variable `XRAY_API_BASE_URL` must be set')
+        raise XrayError('Environment variable `XRAY_API_BASE_URL` must be set') from None
     user_name = getenv('XRAY_API_USER', '')
     user_password = getenv('XRAY_API_PASSWORD', '')
     client_id = getenv('XRAY_CLIENT_ID', '')

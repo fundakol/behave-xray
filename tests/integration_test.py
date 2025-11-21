@@ -44,7 +44,7 @@ def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
     assert 'Uploaded results to JIRA XRAY Test Execution: JIRA-1000' in process.stdout
     assert '4 scenarios passed, 2 failed, 0 skipped' in process.stdout
 
-    with open(report_path.name, 'r') as f:
+    with open(report_path.name) as f:
         report = json.load(f)
 
     assert 'tests' in report
@@ -58,7 +58,7 @@ def test_if_xray_formatter_results_matches_expected_format(auth, tmp_path):
             {
                 'testKey': 'JIRA-32',
                 'status': 'FAIL',
-                'comment': 'Assertion Failed: Not equal',
+                'comment': 'ASSERT FAILED: Not equal',
                 'examples': []
             },
             {
