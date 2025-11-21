@@ -2,7 +2,6 @@ import pytest
 
 from tests.mock_server import MockServer
 
-
 BASE_API_URL = 'http://127.0.0.1:5002'
 
 

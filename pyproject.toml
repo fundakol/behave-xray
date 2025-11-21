@@ -37,3 +37,8 @@ line-length = 120
 quote-style = "double"
 
 [tool.setuptools_scm]
+
+[dependency-groups]
+dev = [
+    "flake8>=5.0.4",
+]

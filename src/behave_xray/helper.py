@@ -3,6 +3,11 @@ from typing import List, Optional
 
 from behave.model import Status
 
+TEST_CASE_PATTERNS: list[re.Pattern] = [
+    re.compile(r'^(TEST_|JIRA\.TESTCASE)(?P<jira_id>[a-zA-Z0-9-_]+)$', flags=re.IGNORECASE),
+    re.compile(r"^(allure|jira)\.testcase[\(]*[\"']*(?P<jira_id>[a-zA-Z0-9-_]+)['\"]*[\)]*$", flags=re.IGNORECASE),
+]
+
 
 def get_test_execution_key_from_tag(tag: str) -> Optional[str]:
     """Return Jira Xray test execution ID or None if not defined."""
@@ -24,19 +29,11 @@ def get_test_plan_key_from_tag(tag: str) -> Optional[str]:
 
 def get_testcase_key_from_tag(tag: str) -> Optional[str]:
     """Return Jira Xray test ID or None if not defined."""
-    match = re.match(r"^(allure|jira)\.testcase\(['\"](.+)['\"]\)$", tag, flags=re.IGNORECASE)
-    if match:
-        return match.group(2)
-    # for outline scenario
-    match = re.match(r'^(allure|jira)\.testcase(.+)$', tag, flags=re.IGNORECASE)
-    if match:
-        return match.group(2)
-    # feature files exported from Jira Xray Cucumber tests
-    match = re.match(r'^TEST_(.+)$', tag, flags=re.IGNORECASE)
-    if match:
-        return match.group(1)
-    else:
-        return None
+    for pattern in TEST_CASE_PATTERNS:
+        match = pattern.match(tag)
+        if match:
+            return match.group('jira_id')
+    return None
 
 
 def get_overall_status(statuses: List[Status]) -> Status:

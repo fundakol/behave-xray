@@ -1,7 +1,6 @@
 import datetime as dt
 from typing import Any, AnyStr, Dict, List, Optional, Union
 
-
 DATETIME_FORMAT: str = '%Y-%m-%dT%H:%M:%S%z'
 DEFAULT_SUMMARY: str = 'Execution of automated tests'
 
